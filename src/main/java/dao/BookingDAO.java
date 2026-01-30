@@ -295,8 +295,12 @@ public class BookingDAO {
         }
         
         if (campsiteId != null && !campsiteId.trim().isEmpty()) {
-            sql.append(" AND b.campsite_id = ?");
-            params.add(Integer.parseInt(campsiteId));
+            try {
+                sql.append(" AND b.campsite_id = ?");
+                params.add(Integer.parseInt(campsiteId));
+            } catch (NumberFormatException e) {
+                // Skip invalid campsite ID filter
+            }
         }
         
         if (dateFrom != null && !dateFrom.trim().isEmpty()) {

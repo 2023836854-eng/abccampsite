@@ -131,10 +131,6 @@ public class ManageBookingServlet extends HttpServlet {
             response.sendRedirect("ManageBookingServlet?message=" + 
                                 java.net.URLEncoder.encode(message, "UTF-8"));
             
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-            response.sendRedirect("ManageBookingServlet?error=" + 
-                                java.net.URLEncoder.encode("Invalid booking ID format", "UTF-8"));
         } catch (Exception e) {
             e.printStackTrace();
             response.sendRedirect("ManageBookingServlet?error=" + 
