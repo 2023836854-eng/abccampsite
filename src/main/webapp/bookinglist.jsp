@@ -1,10 +1,13 @@
-<%@ page import="java.sql.*, java.time.*"%>
+<%@ page import="java.util.*, dao.*, model.*, utils.SessionUtil, java.time.*"%>
 <%
-String guestName = (String) session.getAttribute("guestName");
-if (guestName == null) {
+Integer guestId = SessionUtil.getGuestId(request);
+if (guestId == null) {
 	response.sendRedirect("login.jsp?redirect=bookinglist.jsp");
 	return;
 }
+
+BookingDAO bookingDAO = new BookingDAO();
+List<Booking> bookings = bookingDAO.getByGuestId(guestId);
 %>
 <!DOCTYPE html>
 <html>
@@ -51,6 +54,8 @@ a.view-btn, a.cancel-btn {
 	text-decoration: none;
 	color: #fff;
 	border-radius: 5px;
+	display: inline-block;
+	margin: 2px;
 }
 
 a.view-btn {
@@ -74,6 +79,20 @@ a.cancel-btn {
 	text-align: center;
 	margin-bottom: 15px;
 }
+
+.status-badge {
+	padding: 4px 8px;
+	border-radius: 4px;
+	font-weight: bold;
+	font-size: 12px;
+	display: inline-block;
+}
+
+.status-pending { background: #fff59d; color: #000; }
+.status-confirmed { background: #64b5f6; color: #fff; }
+.status-ongoing { background: #81c784; color: #fff; }
+.status-completed { background: #9e9e9e; color: #fff; }
+.status-cancelled { background: #e57373; color: #fff; }
 </style>
 </head>
 <body>
@@ -95,7 +114,7 @@ a.cancel-btn {
 			<tr>
 				<th>Booking ID</th>
 				<th>Campsite</th>
-				<th>Tent</th>
+				<th>Room</th>
 				<th>Booking Date</th>
 				<th>Number of Tents</th>
 				<th>Total Price (RM)</th>
@@ -104,63 +123,41 @@ a.cancel-btn {
 			</tr>
 
 			<%
-			try {
-				Class.forName("com.mysql.cj.jdbc.Driver");
-				Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/abccampsite", "root", "");
-
-				PreparedStatement ps = con.prepareStatement("SELECT b.booking_id,b.booking_date,b.num_tents,b.total_price,b.status,"
-				+ "c.name AS campsite_name,r.name AS room_name " + "FROM bookings b "
-				+ "JOIN campsites c ON b.campsite_id=c.campsite_id " + "JOIN available_rooms r ON b.room_id=r.room_id "
-				+ "WHERE b.guest_name=? ORDER BY b.booking_date DESC");
-				ps.setString(1, guestName);
-				ResultSet rs = ps.executeQuery();
-				boolean hasBooking = false;
-				LocalDate today = LocalDate.now();
-
-				while (rs.next()) {
-					hasBooking = true;
-					String bid = rs.getString("booking_id");
-					String campName = rs.getString("campsite_name");
-					String rName = rs.getString("room_name");
-					LocalDate bDate = rs.getDate("booking_date").toLocalDate();
-					int tents = rs.getInt("num_tents");
-					double total = rs.getDouble("total_price");
-					String status = rs.getString("status");
-
-					// Allow cancel only if Paid AND more than 3 days before check-in
-					boolean canCancel = status.equalsIgnoreCase("Paid") && !bDate.isBefore(today.plusDays(3));
+			if (bookings.isEmpty()) {
+				out.println("<tr><td colspan='8'>No bookings found.</td></tr>");
+			} else {
+				for (Booking booking : bookings) {
+					String statusClass = "status-pending";
+					String status = booking.getStatus();
+					if ("Confirmed".equalsIgnoreCase(status)) statusClass = "status-confirmed";
+					else if ("Ongoing".equalsIgnoreCase(status)) statusClass = "status-ongoing";
+					else if ("Completed".equalsIgnoreCase(status)) statusClass = "status-completed";
+					else if ("Cancelled".equalsIgnoreCase(status)) statusClass = "status-cancelled";
+					
+					boolean canCancel = ("Pending".equalsIgnoreCase(status) || "Confirmed".equalsIgnoreCase(status));
 			%>
 			<tr>
-				<td><%=bid%></td>
-				<td><%=campName%></td>
-				<td><%=rName%></td>
-				<td><%=bDate%></td>
-				<td><%=tents%></td>
-				<td><%=String.format("%.2f", total)%></td>
-				<td><%=status%></td>
-				<td><a class="view-btn" href="viewbooking.jsp?id=<%=bid%>">View</a>
+				<td><%=booking.getBookingId()%></td>
+				<td><%=booking.getCampsiteName()%></td>
+				<td><%=booking.getRoomName()%></td>
+				<td><%=booking.getBookingDate()%></td>
+				<td><%=booking.getNumTents()%></td>
+				<td><%=String.format("%.2f", booking.getTotalPrice())%></td>
+				<td><span class="status-badge <%=statusClass%>"><%=status%></span></td>
+				<td>
+					<a class="view-btn" href="receipt.jsp?bookingId=<%=booking.getBookingId()%>">View Receipt</a>
 					<%
 					if (canCancel) {
-					%> <a class="cancel-btn"
-					href="cancelbooking.jsp?id=<%=bid%>"
-					onclick="return confirm('Are you sure you want to cancel this booking?');">Cancel</a>
+					%>
+						<a class="cancel-btn" href="cancelbooking.jsp?id=<%=booking.getBookingId()%>"
+						   onclick="return confirm('Are you sure you want to cancel this booking?');">Cancel</a>
 					<%
-					} else {
-					%> <span style="color: gray;">Not cancellable</span> <%
- }
- %>
+					}
+					%>
 				</td>
 			</tr>
 			<%
-			}
-			if (!hasBooking) {
-			out.println("<tr><td colspan='8'>No bookings found.</td></tr>");
-			}
-			rs.close();
-			ps.close();
-			con.close();
-			} catch (Exception e) {
-			out.println("<tr><td colspan='8'>Error: " + e.getMessage() + "</td></tr>");
+				}
 			}
 			%>
 		</table>
