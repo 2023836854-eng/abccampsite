@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>Forgot Password</title>
+<title>Reset Password</title>
 <style>
 body {
 	font-family: Arial, sans-serif;
@@ -29,7 +29,7 @@ h2 {
 	color: #08331c;
 }
 
-input[type="email"] {
+input[type="password"] {
 	width: 90%;
 	padding: 10px;
 	margin: 10px 0;
@@ -47,6 +47,7 @@ input[type="submit"] {
 	cursor: pointer;
 	font-size: 16px;
 	width: 95%;
+	margin-top: 10px;
 }
 
 input[type="submit"]:hover {
@@ -83,13 +84,42 @@ a {
 a:hover {
 	color: #1976D2;
 }
+
+.password-requirements {
+	font-size: 12px;
+	color: #666;
+	text-align: left;
+	margin: 10px 20px;
+	padding: 10px;
+	background-color: #f5f5f5;
+	border-radius: 4px;
+}
 </style>
+<script>
+function validatePasswords() {
+	var password = document.forms["resetForm"]["password"].value;
+	var confirmPassword = document.forms["resetForm"]["confirmPassword"].value;
+	
+	if (password.length < 6) {
+		alert("Password must be at least 6 characters");
+		return false;
+	}
+	
+	if (password !== confirmPassword) {
+		alert("Passwords do not match");
+		return false;
+	}
+	
+	return true;
+}
+</script>
 </head>
 <body>
 	<div class="container">
-		<h2>Reset Password</h2>
+		<h2>Set New Password</h2>
 
 		<%
+		String token = request.getParameter("token");
 		String error = (String) request.getAttribute("error");
 		String success = (String) request.getAttribute("success");
 		
@@ -99,16 +129,30 @@ a:hover {
 		
 		if (success != null) {
 			out.println("<p class='msg success'>" + success + "</p>");
-		}
+			out.println("<a href='login.jsp'>Go to Login</a>");
+		} else if (token != null && !token.isEmpty()) {
 		%>
 
-		<form action="PasswordResetServlet" method="post">
-			<p style="font-size: 14px; color: #555;">
-				Enter your email address and we'll send you a link to reset your password.
-			</p>
-			Email: <input type="email" name="email" required><br>
-			<input type="submit" value="Send Reset Link">
+		<div class="password-requirements">
+			<strong>Password Requirements:</strong>
+			<ul style="margin: 5px 0; padding-left: 20px;">
+				<li>Minimum 6 characters</li>
+				<li>Both passwords must match</li>
+			</ul>
+		</div>
+
+		<form name="resetForm" action="ResetPasswordServlet" method="post" onsubmit="return validatePasswords()">
+			<input type="hidden" name="token" value="<%=token%>">
+			New Password: <input type="password" name="password" required minlength="6"><br>
+			Confirm Password: <input type="password" name="confirmPassword" required minlength="6"><br>
+			<input type="submit" value="Reset Password">
 		</form>
+
+		<%
+		} else {
+			out.println("<p class='msg error'>Invalid or missing reset token.</p>");
+		}
+		%>
 
 		<a href="login.jsp">Back to Login</a>
 	</div>

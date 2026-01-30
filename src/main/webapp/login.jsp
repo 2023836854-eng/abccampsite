@@ -1,11 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1"%>
-<%@ page import="java.sql.*"%>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>Login Guest</title>
+<title>Login</title>
 <link rel="stylesheet" href="css/style.css">
 <style>
 body {
@@ -31,6 +30,23 @@ body {
 h2 {
 	margin-bottom: 25px;
 	color: #08331c;
+}
+
+.user-type {
+	margin: 20px 0;
+	text-align: left;
+	padding-left: 20px;
+}
+
+.user-type label {
+	margin-right: 20px;
+	font-size: 14px;
+	cursor: pointer;
+}
+
+.user-type input[type="radio"] {
+	margin-right: 5px;
+	cursor: pointer;
 }
 
 form input[type="text"], form input[type="password"] {
@@ -61,14 +77,20 @@ form input[type="submit"]:hover {
 .msg {
 	margin-bottom: 15px;
 	font-size: 14px;
+	padding: 10px;
+	border-radius: 6px;
 }
 
 .msg.success {
-	color: green;
+	color: #2e7d32;
+	background-color: #e8f5e9;
+	border: 1px solid #4caf50;
 }
 
 .msg.error {
-	color: red;
+	color: #d32f2f;
+	background-color: #ffebee;
+	border: 1px solid #ef5350;
 }
 
 .register-link {
@@ -83,57 +105,60 @@ form input[type="submit"]:hover {
 	color: #1976D2;
 }
 </style>
+<script>
+function updateFormAction() {
+	var form = document.getElementById("loginForm");
+	var userType = document.querySelector('input[name="userType"]:checked').value;
+	
+	if (userType === "guest") {
+		form.action = "LoginServlet";
+	} else {
+		form.action = "AdminLoginServlet";
+	}
+}
+</script>
 </head>
 <body>
 	<div class="login-container">
-		<h2>Guest Login</h2>
+		<h2>Login</h2>
 
 		<%
 		String msg = request.getParameter("msg");
-		String redirectPage = request.getParameter("redirect"); // ambil page nak redirect
-		if (redirectPage == null || redirectPage.isEmpty()) {
-			redirectPage = "index.jsp"; // default ke index
-		}
-
+		String error = (String) request.getAttribute("error");
+		String success = (String) request.getAttribute("success");
+		
 		if ("registered".equals(msg)) {
 			out.println("<p class='msg success'>Registration successful! Please login.</p>");
 		}
-
-		if (request.getMethod().equalsIgnoreCase("POST")) {
-			String ic = request.getParameter("ic");
-			String password = request.getParameter("password");
-			try {
-				Class.forName("com.mysql.cj.jdbc.Driver");
-				Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/abccampsite", "root", "");
-				PreparedStatement ps = con.prepareStatement("SELECT name FROM guests WHERE ic=? AND password=?");
-				ps.setString(1, ic);
-				ps.setString(2, password);
-				ResultSet rs = ps.executeQuery();
-				if (rs.next()) {
-			session.setAttribute("guestName", rs.getString("name"));
-			response.sendRedirect(redirectPage); 
-			out.println("<p class='msg error'>IC Number or Password incorrect!</p>");
-				}
-				rs.close();
-				ps.close();
-				con.close();
-			} catch (Exception e) {
-				out.println("<p class='msg error'>Error: " + e.getMessage() + "</p>");
-			}
+		
+		if (error != null) {
+			out.println("<p class='msg error'>" + error + "</p>");
+		}
+		
+		if (success != null) {
+			out.println("<p class='msg success'>" + success + "</p>");
 		}
 		%>
 
-		<form action="login.jsp" method="post">
-			<input type="hidden" name="redirect" value="<%=redirectPage%>">
+		<form id="loginForm" action="LoginServlet" method="post">
+			<div class="user-type">
+				<label>
+					<input type="radio" name="userType" value="guest" checked onchange="updateFormAction()">
+					Guest
+				</label>
+				<label>
+					<input type="radio" name="userType" value="admin" onchange="updateFormAction()">
+					Admin
+				</label>
+			</div>
+			
 			IC Number: <input type="text" name="ic" required><br>
 			Password: <input type="password" name="password" required><br>
 			<input type="submit" value="Login">
 		</form>
 
-		<a class="register-link"
-			href="registercustomer.jsp?redirect=<%=redirectPage%>">Don't
-			have an account? Register</a> <a class="register-link"
-			href="forgotpassword.jsp">Forgot Password?</a>
+		<a class="register-link" href="registercustomer.jsp">Don't have an account? Register</a>
+		<a class="register-link" href="forgotpassword.jsp">Forgot Password?</a>
 
 	</div>
 </body>
