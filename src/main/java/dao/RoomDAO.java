@@ -164,17 +164,79 @@ public class RoomDAO {
     }
     
     public boolean updateQuota(int roomId, int quantity) {
-        try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(
-                 "UPDATE available_rooms SET available_quota = available_quota - ? WHERE room_id = ? AND available_quota >= ?")) {
-            ps.setInt(1, quantity);
-            ps.setInt(2, roomId);
-            ps.setInt(3, quantity);
-            int rowsAffected = ps.executeUpdate();
+        Connection con = null;
+        PreparedStatement selectPs = null;
+        PreparedStatement updatePs = null;
+        ResultSet rs = null;
+        try {
+            con = DBConnection.getConnection();
+            con.setAutoCommit(false);
+            con.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+
+            String selectSql = "SELECT available_quota FROM available_rooms WHERE room_id = ? FOR UPDATE";
+            selectPs = con.prepareStatement(selectSql);
+            selectPs.setInt(1, roomId);
+            rs = selectPs.executeQuery();
+
+            if (!rs.next()) {
+                con.rollback();
+                return false;
+            }
+
+            int availableQuota = rs.getInt(1);
+            if (availableQuota < quantity) {
+                con.rollback();
+                return false;
+            }
+
+            String updateSql = "UPDATE available_rooms SET available_quota = available_quota - ? WHERE room_id = ?";
+            updatePs = con.prepareStatement(updateSql);
+            updatePs.setInt(1, quantity);
+            updatePs.setInt(2, roomId);
+            int rowsAffected = updatePs.executeUpdate();
+
+            con.commit();
             return rowsAffected > 0;
         } catch (Exception e) {
+            if (con != null) {
+                try {
+                    con.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
             e.printStackTrace();
             return false;
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (selectPs != null) {
+                try {
+                    selectPs.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (updatePs != null) {
+                try {
+                    updatePs.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (con != null) {
+                try {
+                    con.setAutoCommit(true);
+                    con.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }
