@@ -11,7 +11,7 @@ public class GuestDAO {
     public boolean register(Guest guest) {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                 "INSERT INTO guest(name, ic, password, phone, email, address, dob) VALUES(?,?,?,?,?,?,?)")) {
+                 "INSERT INTO guests(name, ic, password, phone, email, address, dob) VALUES(?,?,?,?,?,?,?)")) {
             ps.setString(1, guest.getName());
             ps.setString(2, guest.getIc());
             ps.setString(3, guest.getPassword());
@@ -31,7 +31,7 @@ public class GuestDAO {
         Guest guest = null;
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                 "SELECT * FROM guest WHERE ic = ? AND password = ?")) {
+                 "SELECT * FROM guests WHERE ic = ? AND password = ?")) {
             ps.setString(1, ic);
             ps.setString(2, password);
             try (ResultSet rs = ps.executeQuery()) {
@@ -58,7 +58,7 @@ public class GuestDAO {
     public Guest getById(int guestId) {
         Guest guest = null;
         try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement("SELECT * FROM guest WHERE guest_id = ?")) {
+             PreparedStatement ps = con.prepareStatement("SELECT * FROM guests WHERE guest_id = ?")) {
             ps.setInt(1, guestId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -84,7 +84,7 @@ public class GuestDAO {
     public Guest getByEmail(String email) {
         Guest guest = null;
         try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement("SELECT * FROM guest WHERE email = ?")) {
+             PreparedStatement ps = con.prepareStatement("SELECT * FROM guests WHERE email = ?")) {
             ps.setString(1, email);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -110,7 +110,7 @@ public class GuestDAO {
     public Guest getByIc(String ic) {
         Guest guest = null;
         try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement("SELECT * FROM guest WHERE ic = ?")) {
+             PreparedStatement ps = con.prepareStatement("SELECT * FROM guests WHERE ic = ?")) {
             ps.setString(1, ic);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -136,7 +136,7 @@ public class GuestDAO {
     public boolean updateProfile(Guest guest) {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                 "UPDATE guest SET name=?, phone=?, email=?, address=?, dob=? WHERE guest_id=?")) {
+                 "UPDATE guests SET name=?, phone=?, email=?, address=?, dob=? WHERE guest_id=?")) {
             ps.setString(1, guest.getName());
             ps.setString(2, guest.getPhone());
             ps.setString(3, guest.getEmail());
@@ -154,7 +154,7 @@ public class GuestDAO {
     public boolean updatePassword(int guestId, String newPassword) {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                 "UPDATE guest SET password=? WHERE guest_id=?")) {
+                 "UPDATE guests SET password=? WHERE guest_id=?")) {
             ps.setString(1, newPassword);
             ps.setInt(2, guestId);
             ps.executeUpdate();

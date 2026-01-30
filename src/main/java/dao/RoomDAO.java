@@ -12,8 +12,8 @@ public class RoomDAO {
         List<AvailableRoom> list = new ArrayList<>();
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                 "SELECT r.*, c.name as campsite_name FROM available_room r " +
-                 "JOIN campsite c ON r.campsite_id = c.campsite_id " +
+                 "SELECT r.*, c.name as campsite_name FROM available_rooms r " +
+                 "JOIN campsites c ON r.campsite_id = c.campsite_id " +
                  "WHERE r.campsite_id = ? ORDER BY r.created_at DESC")) {
             ps.setInt(1, campsiteId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -45,8 +45,8 @@ public class RoomDAO {
         List<AvailableRoom> list = new ArrayList<>();
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                 "SELECT r.*, c.name as campsite_name FROM available_room r " +
-                 "JOIN campsite c ON r.campsite_id = c.campsite_id " +
+                 "SELECT r.*, c.name as campsite_name FROM available_rooms r " +
+                 "JOIN campsites c ON r.campsite_id = c.campsite_id " +
                  "WHERE r.campsite_id = ? AND r.is_active = 1 ORDER BY r.name")) {
             ps.setInt(1, campsiteId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -78,8 +78,8 @@ public class RoomDAO {
         AvailableRoom room = null;
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                 "SELECT r.*, c.name as campsite_name FROM available_room r " +
-                 "JOIN campsite c ON r.campsite_id = c.campsite_id " +
+                 "SELECT r.*, c.name as campsite_name FROM available_rooms r " +
+                 "JOIN campsites c ON r.campsite_id = c.campsite_id " +
                  "WHERE r.room_id = ?")) {
             ps.setInt(1, roomId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -109,7 +109,7 @@ public class RoomDAO {
     public boolean add(AvailableRoom room) {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                 "INSERT INTO available_room(campsite_id, name, location, description, image, price_per_tent, quota, available_quota, is_active) " +
+                 "INSERT INTO available_rooms(campsite_id, name, location, description, image, price_per_tent, quota, available_quota, is_active) " +
                  "VALUES(?,?,?,?,?,?,?,?,?)")) {
             ps.setInt(1, room.getCampsiteId());
             ps.setString(2, room.getName());
@@ -131,7 +131,7 @@ public class RoomDAO {
     public boolean update(AvailableRoom room) {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                 "UPDATE available_room SET campsite_id=?, name=?, location=?, description=?, image=?, " +
+                 "UPDATE available_rooms SET campsite_id=?, name=?, location=?, description=?, image=?, " +
                  "price_per_tent=?, quota=?, available_quota=?, is_active=? WHERE room_id=?")) {
             ps.setInt(1, room.getCampsiteId());
             ps.setString(2, room.getName());
@@ -153,7 +153,7 @@ public class RoomDAO {
     
     public boolean delete(int roomId) {
         try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement("DELETE FROM available_room WHERE room_id=?")) {
+             PreparedStatement ps = con.prepareStatement("DELETE FROM available_rooms WHERE room_id=?")) {
             ps.setInt(1, roomId);
             ps.executeUpdate();
             return true;
@@ -166,11 +166,12 @@ public class RoomDAO {
     public boolean updateQuota(int roomId, int quantity) {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                 "UPDATE available_room SET available_quota = available_quota - ? WHERE room_id=?")) {
+                 "UPDATE available_rooms SET available_quota = available_quota - ? WHERE room_id = ? AND available_quota >= ?")) {
             ps.setInt(1, quantity);
             ps.setInt(2, roomId);
-            ps.executeUpdate();
-            return true;
+            ps.setInt(3, quantity);
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
         } catch (Exception e) {
             e.printStackTrace();
             return false;

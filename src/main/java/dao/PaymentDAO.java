@@ -11,7 +11,7 @@ public class PaymentDAO {
     public boolean create(Payment payment) {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                 "INSERT INTO payment(booking_id, payment_method, payment_date, amount, transaction_id, status, receipt_path) " +
+                 "INSERT INTO payments(booking_id, payment_method, payment_date, amount, transaction_id, status, receipt_path) " +
                  "VALUES(?,?,?,?,?,?,?)")) {
             ps.setString(1, payment.getBookingId());
             ps.setString(2, payment.getPaymentMethod());
@@ -33,10 +33,10 @@ public class PaymentDAO {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
                  "SELECT p.*, g.name as guest_name, c.name as campsite_name " +
-                 "FROM payment p " +
-                 "JOIN booking b ON p.booking_id = b.booking_id " +
-                 "JOIN guest g ON b.guest_id = g.guest_id " +
-                 "JOIN campsite c ON b.campsite_id = c.campsite_id " +
+                 "FROM payments p " +
+                 "JOIN bookings b ON p.booking_id = b.booking_id " +
+                 "JOIN guests g ON b.guest_id = g.guest_id " +
+                 "JOIN campsites c ON b.campsite_id = c.campsite_id " +
                  "WHERE p.payment_id = ?")) {
             ps.setInt(1, paymentId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -66,10 +66,10 @@ public class PaymentDAO {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
                  "SELECT p.*, g.name as guest_name, c.name as campsite_name " +
-                 "FROM payment p " +
-                 "JOIN booking b ON p.booking_id = b.booking_id " +
-                 "JOIN guest g ON b.guest_id = g.guest_id " +
-                 "JOIN campsite c ON b.campsite_id = c.campsite_id " +
+                 "FROM payments p " +
+                 "JOIN bookings b ON p.booking_id = b.booking_id " +
+                 "JOIN guests g ON b.guest_id = g.guest_id " +
+                 "JOIN campsites c ON b.campsite_id = c.campsite_id " +
                  "WHERE p.booking_id = ?")) {
             ps.setString(1, bookingId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -97,7 +97,7 @@ public class PaymentDAO {
     public boolean updateStatus(int paymentId, String status) {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                 "UPDATE payment SET status=? WHERE payment_id=?")) {
+                 "UPDATE payments SET status=? WHERE payment_id=?")) {
             ps.setString(1, status);
             ps.setInt(2, paymentId);
             ps.executeUpdate();
@@ -114,10 +114,10 @@ public class PaymentDAO {
              Statement st = con.createStatement();
              ResultSet rs = st.executeQuery(
                  "SELECT p.*, g.name as guest_name, c.name as campsite_name " +
-                 "FROM payment p " +
-                 "JOIN booking b ON p.booking_id = b.booking_id " +
-                 "JOIN guest g ON b.guest_id = g.guest_id " +
-                 "JOIN campsite c ON b.campsite_id = c.campsite_id " +
+                 "FROM payments p " +
+                 "JOIN bookings b ON p.booking_id = b.booking_id " +
+                 "JOIN guests g ON b.guest_id = g.guest_id " +
+                 "JOIN campsites c ON b.campsite_id = c.campsite_id " +
                  "ORDER BY p.created_at DESC")) {
             while (rs.next()) {
                 Payment payment = new Payment();

@@ -9,7 +9,7 @@ public class PasswordResetDAO {
     public boolean createToken(int guestId, String email, String token, Timestamp expiresAt) {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                 "INSERT INTO password_reset(guest_id, email, reset_token, expires_at, used) VALUES(?,?,?,?,0)")) {
+                 "INSERT INTO password_resets(guest_id, email, reset_token, expires_at, used) VALUES(?,?,?,?,0)")) {
             ps.setInt(1, guestId);
             ps.setString(2, email);
             ps.setString(3, token);
@@ -26,7 +26,7 @@ public class PasswordResetDAO {
         PasswordReset reset = null;
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                 "SELECT * FROM password_reset WHERE reset_token = ?")) {
+                 "SELECT * FROM password_resets WHERE reset_token = ?")) {
             ps.setString(1, token);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -49,7 +49,7 @@ public class PasswordResetDAO {
     public boolean validateToken(String token) {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                 "SELECT * FROM password_reset WHERE reset_token = ? AND used = 0 AND expires_at > NOW()")) {
+                 "SELECT * FROM password_resets WHERE reset_token = ? AND used = 0 AND expires_at > NOW()")) {
             ps.setString(1, token);
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next();
@@ -63,7 +63,7 @@ public class PasswordResetDAO {
     public boolean markAsUsed(String token) {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                 "UPDATE password_reset SET used = 1 WHERE reset_token = ?")) {
+                 "UPDATE password_resets SET used = 1 WHERE reset_token = ?")) {
             ps.setString(1, token);
             ps.executeUpdate();
             return true;
@@ -76,7 +76,7 @@ public class PasswordResetDAO {
     public boolean deleteExpired() {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                 "DELETE FROM password_reset WHERE expires_at < NOW()")) {
+                 "DELETE FROM password_resets WHERE expires_at < NOW()")) {
             ps.executeUpdate();
             return true;
         } catch (Exception e) {

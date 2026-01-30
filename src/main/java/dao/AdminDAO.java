@@ -12,7 +12,7 @@ public class AdminDAO {
         Admin admin = null;
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                 "SELECT * FROM admin WHERE username = ? AND password = ? AND is_active = 1")) {
+                 "SELECT * FROM admins WHERE username = ? AND password = ? AND is_active = 1")) {
             ps.setString(1, username);
             ps.setString(2, password);
             try (ResultSet rs = ps.executeQuery()) {
@@ -38,7 +38,7 @@ public class AdminDAO {
     public Admin getById(int adminId) {
         Admin admin = null;
         try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement("SELECT * FROM admin WHERE admin_id = ?")) {
+             PreparedStatement ps = con.prepareStatement("SELECT * FROM admins WHERE admin_id = ?")) {
             ps.setInt(1, adminId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -64,7 +64,7 @@ public class AdminDAO {
         List<Admin> list = new ArrayList<>();
         try (Connection con = DBConnection.getConnection();
              Statement st = con.createStatement();
-             ResultSet rs = st.executeQuery("SELECT * FROM admin ORDER BY created_at DESC")) {
+             ResultSet rs = st.executeQuery("SELECT * FROM admins ORDER BY created_at DESC")) {
             while (rs.next()) {
                 Admin admin = new Admin();
                 admin.setAdminId(rs.getInt("admin_id"));
@@ -87,7 +87,7 @@ public class AdminDAO {
     public boolean add(Admin admin) {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                 "INSERT INTO admin(username, password, full_name, email, role, is_active) VALUES(?,?,?,?,?,?)")) {
+                 "INSERT INTO admins(username, password, full_name, email, role, is_active) VALUES(?,?,?,?,?,?)")) {
             ps.setString(1, admin.getUsername());
             ps.setString(2, admin.getPassword());
             ps.setString(3, admin.getFullName());
@@ -105,7 +105,7 @@ public class AdminDAO {
     public boolean update(Admin admin) {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                 "UPDATE admin SET username=?, full_name=?, email=?, role=?, is_active=? WHERE admin_id=?")) {
+                 "UPDATE admins SET username=?, full_name=?, email=?, role=?, is_active=? WHERE admin_id=?")) {
             ps.setString(1, admin.getUsername());
             ps.setString(2, admin.getFullName());
             ps.setString(3, admin.getEmail());
@@ -122,7 +122,7 @@ public class AdminDAO {
     
     public boolean delete(int adminId) {
         try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement("DELETE FROM admin WHERE admin_id=?")) {
+             PreparedStatement ps = con.prepareStatement("DELETE FROM admins WHERE admin_id=?")) {
             ps.setInt(1, adminId);
             ps.executeUpdate();
             return true;

@@ -13,7 +13,7 @@ public class BookingDAO {
     public boolean create(Booking booking) {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                 "INSERT INTO booking(booking_id, guest_id, campsite_id, room_id, booking_date, checkout_date, " +
+                 "INSERT INTO bookings(booking_id, guest_id, campsite_id, room_id, booking_date, checkout_date, " +
                  "num_tents, total_price, status, payment_status) VALUES(?,?,?,?,?,?,?,?,?,?)")) {
             ps.setString(1, booking.getBookingId());
             ps.setInt(2, booking.getGuestId());
@@ -39,10 +39,10 @@ public class BookingDAO {
              PreparedStatement ps = con.prepareStatement(
                  "SELECT b.*, g.name as guest_name, g.ic as guest_ic, g.phone as guest_phone, g.email as guest_email, " +
                  "c.name as campsite_name, r.name as room_name " +
-                 "FROM booking b " +
-                 "JOIN guest g ON b.guest_id = g.guest_id " +
-                 "JOIN campsite c ON b.campsite_id = c.campsite_id " +
-                 "JOIN available_room r ON b.room_id = r.room_id " +
+                 "FROM bookings b " +
+                 "JOIN guests g ON b.guest_id = g.guest_id " +
+                 "JOIN campsites c ON b.campsite_id = c.campsite_id " +
+                 "JOIN available_rooms r ON b.room_id = r.room_id " +
                  "WHERE b.booking_id = ?")) {
             ps.setString(1, bookingId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -82,10 +82,10 @@ public class BookingDAO {
              PreparedStatement ps = con.prepareStatement(
                  "SELECT b.*, g.name as guest_name, g.ic as guest_ic, g.phone as guest_phone, g.email as guest_email, " +
                  "c.name as campsite_name, r.name as room_name " +
-                 "FROM booking b " +
-                 "JOIN guest g ON b.guest_id = g.guest_id " +
-                 "JOIN campsite c ON b.campsite_id = c.campsite_id " +
-                 "JOIN available_room r ON b.room_id = r.room_id " +
+                 "FROM bookings b " +
+                 "JOIN guests g ON b.guest_id = g.guest_id " +
+                 "JOIN campsites c ON b.campsite_id = c.campsite_id " +
+                 "JOIN available_rooms r ON b.room_id = r.room_id " +
                  "WHERE b.guest_id = ? ORDER BY b.created_at DESC")) {
             ps.setInt(1, guestId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -127,10 +127,10 @@ public class BookingDAO {
              ResultSet rs = st.executeQuery(
                  "SELECT b.*, g.name as guest_name, g.ic as guest_ic, g.phone as guest_phone, g.email as guest_email, " +
                  "c.name as campsite_name, r.name as room_name " +
-                 "FROM booking b " +
-                 "JOIN guest g ON b.guest_id = g.guest_id " +
-                 "JOIN campsite c ON b.campsite_id = c.campsite_id " +
-                 "JOIN available_room r ON b.room_id = r.room_id " +
+                 "FROM bookings b " +
+                 "JOIN guests g ON b.guest_id = g.guest_id " +
+                 "JOIN campsites c ON b.campsite_id = c.campsite_id " +
+                 "JOIN available_rooms r ON b.room_id = r.room_id " +
                  "ORDER BY b.created_at DESC")) {
             while (rs.next()) {
                 Booking booking = new Booking();
@@ -165,7 +165,7 @@ public class BookingDAO {
     public boolean updateStatus(String bookingId, String status) {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                 "UPDATE booking SET status=? WHERE booking_id=?")) {
+                 "UPDATE bookings SET status=? WHERE booking_id=?")) {
             ps.setString(1, status);
             ps.setString(2, bookingId);
             ps.executeUpdate();
@@ -179,7 +179,7 @@ public class BookingDAO {
     public boolean updatePaymentStatus(String bookingId, String paymentStatus) {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                 "UPDATE booking SET payment_status=? WHERE booking_id=?")) {
+                 "UPDATE bookings SET payment_status=? WHERE booking_id=?")) {
             ps.setString(1, paymentStatus);
             ps.setString(2, bookingId);
             ps.executeUpdate();
@@ -193,7 +193,7 @@ public class BookingDAO {
     public boolean cancel(String bookingId, String reason) {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                 "UPDATE booking SET status='Cancelled', cancellation_reason=?, cancelled_at=NOW() WHERE booking_id=?")) {
+                 "UPDATE bookings SET status='Cancelled', cancellation_reason=?, cancelled_at=NOW() WHERE booking_id=?")) {
             ps.setString(1, reason);
             ps.setString(2, bookingId);
             ps.executeUpdate();
@@ -211,10 +211,10 @@ public class BookingDAO {
              ResultSet rs = st.executeQuery(
                  "SELECT b.*, g.name as guest_name, g.ic as guest_ic, g.phone as guest_phone, g.email as guest_email, " +
                  "c.name as campsite_name, r.name as room_name " +
-                 "FROM booking b " +
-                 "JOIN guest g ON b.guest_id = g.guest_id " +
-                 "JOIN campsite c ON b.campsite_id = c.campsite_id " +
-                 "JOIN available_room r ON b.room_id = r.room_id " +
+                 "FROM bookings b " +
+                 "JOIN guests g ON b.guest_id = g.guest_id " +
+                 "JOIN campsites c ON b.campsite_id = c.campsite_id " +
+                 "JOIN available_rooms r ON b.room_id = r.room_id " +
                  "WHERE b.booking_date >= CURDATE() AND b.status IN ('Pending', 'Confirmed') " +
                  "ORDER BY b.booking_date ASC LIMIT 10")) {
             while (rs.next()) {
@@ -248,29 +248,29 @@ public class BookingDAO {
         Map<String, Object> stats = new HashMap<>();
         try (Connection con = DBConnection.getConnection();
              Statement st = con.createStatement()) {
-            ResultSet rs = st.executeQuery("SELECT COUNT(*) as total FROM booking");
-            if (rs.next()) {
-                stats.put("totalBookings", rs.getInt("total"));
+            try (ResultSet rs = st.executeQuery("SELECT COUNT(*) as total FROM bookings")) {
+                if (rs.next()) {
+                    stats.put("totalBookings", rs.getInt("total"));
+                }
             }
-            rs.close();
             
-            rs = st.executeQuery("SELECT COUNT(*) as total FROM booking WHERE status = 'Pending'");
-            if (rs.next()) {
-                stats.put("pendingBookings", rs.getInt("total"));
+            try (ResultSet rs = st.executeQuery("SELECT COUNT(*) as total FROM bookings WHERE status = 'Pending'")) {
+                if (rs.next()) {
+                    stats.put("pendingBookings", rs.getInt("total"));
+                }
             }
-            rs.close();
             
-            rs = st.executeQuery("SELECT COUNT(*) as total FROM booking WHERE status = 'Confirmed'");
-            if (rs.next()) {
-                stats.put("confirmedBookings", rs.getInt("total"));
+            try (ResultSet rs = st.executeQuery("SELECT COUNT(*) as total FROM bookings WHERE status = 'Confirmed'")) {
+                if (rs.next()) {
+                    stats.put("confirmedBookings", rs.getInt("total"));
+                }
             }
-            rs.close();
             
-            rs = st.executeQuery("SELECT SUM(total_price) as total FROM booking WHERE payment_status = 'Paid'");
-            if (rs.next()) {
-                stats.put("totalRevenue", rs.getBigDecimal("total"));
+            try (ResultSet rs = st.executeQuery("SELECT SUM(total_price) as total FROM bookings WHERE payment_status = 'Paid'")) {
+                if (rs.next()) {
+                    stats.put("totalRevenue", rs.getBigDecimal("total"));
+                }
             }
-            rs.close();
         } catch (Exception e) {
             e.printStackTrace();
         }

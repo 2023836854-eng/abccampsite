@@ -12,7 +12,7 @@ public class CampsiteDAO {
         List<Campsite> list = new ArrayList<>();
         try (Connection con = DBConnection.getConnection();
              Statement st = con.createStatement();
-             ResultSet rs = st.executeQuery("SELECT * FROM campsite ORDER BY created_at DESC")) {
+             ResultSet rs = st.executeQuery("SELECT * FROM campsites ORDER BY created_at DESC")) {
             while (rs.next()) {
                 Campsite campsite = new Campsite();
                 campsite.setCampsiteId(rs.getInt("campsite_id"));
@@ -35,7 +35,7 @@ public class CampsiteDAO {
         List<Campsite> list = new ArrayList<>();
         try (Connection con = DBConnection.getConnection();
              Statement st = con.createStatement();
-             ResultSet rs = st.executeQuery("SELECT * FROM campsite WHERE is_active = 1 ORDER BY name")) {
+             ResultSet rs = st.executeQuery("SELECT * FROM campsites WHERE is_active = 1 ORDER BY name")) {
             while (rs.next()) {
                 Campsite campsite = new Campsite();
                 campsite.setCampsiteId(rs.getInt("campsite_id"));
@@ -57,7 +57,7 @@ public class CampsiteDAO {
     public Campsite getById(int campsiteId) {
         Campsite campsite = null;
         try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement("SELECT * FROM campsite WHERE campsite_id = ?")) {
+             PreparedStatement ps = con.prepareStatement("SELECT * FROM campsites WHERE campsite_id = ?")) {
             ps.setInt(1, campsiteId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -81,7 +81,7 @@ public class CampsiteDAO {
     public boolean add(Campsite campsite) {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                 "INSERT INTO campsite(name, location, description, image, is_active) VALUES(?,?,?,?,?)")) {
+                 "INSERT INTO campsites(name, location, description, image, is_active) VALUES(?,?,?,?,?)")) {
             ps.setString(1, campsite.getName());
             ps.setString(2, campsite.getLocation());
             ps.setString(3, campsite.getDescription());
@@ -98,7 +98,7 @@ public class CampsiteDAO {
     public boolean update(Campsite campsite) {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                 "UPDATE campsite SET name=?, location=?, description=?, image=?, is_active=? WHERE campsite_id=?")) {
+                 "UPDATE campsites SET name=?, location=?, description=?, image=?, is_active=? WHERE campsite_id=?")) {
             ps.setString(1, campsite.getName());
             ps.setString(2, campsite.getLocation());
             ps.setString(3, campsite.getDescription());
@@ -115,7 +115,7 @@ public class CampsiteDAO {
     
     public boolean delete(int campsiteId) {
         try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement("DELETE FROM campsite WHERE campsite_id=?")) {
+             PreparedStatement ps = con.prepareStatement("DELETE FROM campsites WHERE campsite_id=?")) {
             ps.setInt(1, campsiteId);
             ps.executeUpdate();
             return true;
@@ -128,7 +128,7 @@ public class CampsiteDAO {
     public boolean toggleActive(int campsiteId) {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(
-                 "UPDATE campsite SET is_active = NOT is_active WHERE campsite_id=?")) {
+                 "UPDATE campsites SET is_active = NOT is_active WHERE campsite_id=?")) {
             ps.setInt(1, campsiteId);
             ps.executeUpdate();
             return true;
