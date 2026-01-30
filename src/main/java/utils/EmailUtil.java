@@ -9,10 +9,13 @@ package utils;
 public class EmailUtil {
     
     // SMTP Configuration (to be configured)
-    private static final String SMTP_HOST = "smtp.gmail.com";
-    private static final String SMTP_PORT = "587";
-    private static final String SMTP_USERNAME = "your-email@gmail.com";
-    private static final String SMTP_PASSWORD = "your-password";
+    // For security, load SMTP settings (especially credentials) from environment variables.
+    // Example environment variables:
+    //   SMTP_HOST, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD
+    private static final String SMTP_HOST = System.getenv("SMTP_HOST");
+    private static final String SMTP_PORT = System.getenv("SMTP_PORT");
+    private static final String SMTP_USERNAME = System.getenv("SMTP_USERNAME");
+    private static final String SMTP_PASSWORD = System.getenv("SMTP_PASSWORD");
     private static final String FROM_EMAIL = "noreply@abccampsite.com";
     private static final String FROM_NAME = "ABC Campsite System";
     
