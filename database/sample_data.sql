@@ -8,11 +8,11 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 -- Sample Admins
 -- --------------------------------------------------------
--- Password: admin123 (hashed with BCrypt - $2a$10$)
--- Note: For actual implementation, use proper BCrypt hashing
+-- Password: admin123 (hashed with SHA-256)
+-- Note: For actual implementation, ensure hashing matches PasswordUtil (currently SHA-256)
 INSERT INTO `admins` (`admin_id`, `username`, `password`, `full_name`, `email`, `role`, `is_active`) VALUES
-(1, 'admin', '$2a$10$YQlDfJKL3QjKgM4H0w5lLe0vKJFdJYzV8qQ7.x1zj8qY7.Y1zj8qY', 'System Administrator', 'admin@abccampsite.com', 'Admin', 1),
-(2, 'staff1', '$2a$10$YQlDfJKL3QjKgM4H0w5lLe0vKJFdJYzV8qQ7.x1zj8qY7.Y1zj8qY', 'Staff Member One', 'staff1@abccampsite.com', 'Staff', 1);
+(1, 'admin', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'System Administrator', 'admin@abccampsite.com', 'Admin', 1),
+(2, 'staff1', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Staff Member One', 'staff1@abccampsite.com', 'Staff', 1);
 
 -- --------------------------------------------------------
 -- Sample Campsites
