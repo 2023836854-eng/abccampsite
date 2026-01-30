@@ -86,14 +86,12 @@ public class ManageBookingServlet extends HttpServlet {
         try {
             // Get action and bookingId parameters
             String action = request.getParameter("action");
-            String bookingIdStr = request.getParameter("bookingId");
+            String bookingId = request.getParameter("bookingId");
             
-            if (bookingIdStr == null || bookingIdStr.trim().isEmpty()) {
+            if (bookingId == null || bookingId.trim().isEmpty()) {
                 response.sendRedirect("ManageBookingServlet?error=Invalid booking ID");
                 return;
             }
-            
-            int bookingId = Integer.parseInt(bookingIdStr);
             
             String message = "";
             

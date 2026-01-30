@@ -164,4 +164,17 @@ public class GuestDAO {
             return false;
         }
     }
+    
+    public int getCount() {
+        try (Connection con = DBConnection.getConnection();
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery("SELECT COUNT(*) as total FROM guests")) {
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 }

@@ -88,8 +88,8 @@ public class PaymentServlet extends HttpServlet {
                     try {
                         EmailUtil.sendBookingConfirmation(
                             booking.getGuestEmail() != null ? booking.getGuestEmail() : "",
-                            booking.getGuestName() != null ? booking.getGuestName() : "",
                             bookingId,
+                            booking.getGuestName() != null ? booking.getGuestName() : "",
                             booking.getCampsiteName() != null ? booking.getCampsiteName() : "",
                             booking.getBookingDate().toString(),
                             booking.getCheckoutDate().toString(),
