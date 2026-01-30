@@ -48,7 +48,7 @@ public class EmailUtil {
      */
     public static boolean sendBookingConfirmation(String toEmail, String bookingId, 
                                                    String guestName, String campsiteName, 
-                                                   String bookingDate, String totalPrice) {
+                                                   String bookingDate, String checkoutDate, String totalPrice) {
         String subject = "Booking Confirmation - " + bookingId;
         
         StringBuilder body = new StringBuilder();
@@ -57,7 +57,8 @@ public class EmailUtil {
         body.append("Booking Details:\n");
         body.append("- Booking ID: ").append(bookingId).append("\n");
         body.append("- Campsite: ").append(campsiteName).append("\n");
-        body.append("- Date: ").append(bookingDate).append("\n");
+        body.append("- Check-in Date: ").append(bookingDate).append("\n");
+        body.append("- Check-out Date: ").append(checkoutDate).append("\n");
         body.append("- Total Price: RM ").append(totalPrice).append("\n\n");
         body.append("Thank you for choosing ABC Campsite!\n\n");
         body.append("Best regards,\n");

@@ -137,4 +137,17 @@ public class CampsiteDAO {
             return false;
         }
     }
+    
+    public int getActiveCount() {
+        try (Connection con = DBConnection.getConnection();
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery("SELECT COUNT(*) as total FROM campsites WHERE is_active = 1")) {
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 }

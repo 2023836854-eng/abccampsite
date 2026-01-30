@@ -239,4 +239,35 @@ public class RoomDAO {
             }
         }
     }
+    
+    public List<AvailableRoom> getAll() {
+        List<AvailableRoom> list = new ArrayList<>();
+        try (Connection con = DBConnection.getConnection();
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery(
+                 "SELECT r.*, c.name as campsite_name FROM available_rooms r " +
+                 "JOIN campsites c ON r.campsite_id = c.campsite_id " +
+                 "ORDER BY c.name, r.name")) {
+            while (rs.next()) {
+                AvailableRoom room = new AvailableRoom();
+                room.setRoomId(rs.getInt("room_id"));
+                room.setCampsiteId(rs.getInt("campsite_id"));
+                room.setName(rs.getString("name"));
+                room.setLocation(rs.getString("location"));
+                room.setDescription(rs.getString("description"));
+                room.setImage(rs.getString("image"));
+                room.setPricePerTent(rs.getBigDecimal("price_per_tent"));
+                room.setQuota(rs.getInt("quota"));
+                room.setAvailableQuota(rs.getInt("available_quota"));
+                room.setActive(rs.getBoolean("is_active"));
+                room.setCreatedAt(rs.getTimestamp("created_at"));
+                room.setUpdatedAt(rs.getTimestamp("updated_at"));
+                room.setCampsiteName(rs.getString("campsite_name"));
+                list.add(room);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }

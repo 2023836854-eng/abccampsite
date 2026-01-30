@@ -55,7 +55,7 @@ public class DashboardServlet extends HttpServlet {
             request.setAttribute("upcomingBookings", upcomingBookings);
             
             // Get active campsites count
-            int activeCampsites = campsiteDAO.getActive();
+            int activeCampsites = campsiteDAO.getActiveCount();
             request.setAttribute("activeCampsites", activeCampsites);
             
             // Forward to dashboard page

@@ -276,4 +276,91 @@ public class BookingDAO {
         }
         return stats;
     }
+    
+    public List<Booking> getFiltered(String status, String campsiteId, String dateFrom, String dateTo, String guestName) {
+        List<Booking> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+            "SELECT b.*, g.name as guest_name, g.ic as guest_ic, g.phone as guest_phone, g.email as guest_email, " +
+            "c.name as campsite_name, r.name as room_name " +
+            "FROM bookings b " +
+            "JOIN guests g ON b.guest_id = g.guest_id " +
+            "JOIN campsites c ON b.campsite_id = c.campsite_id " +
+            "JOIN available_rooms r ON b.room_id = r.room_id WHERE 1=1");
+        
+        List<Object> params = new ArrayList<>();
+        
+        if (status != null && !status.trim().isEmpty()) {
+            sql.append(" AND b.status = ?");
+            params.add(status);
+        }
+        
+        if (campsiteId != null && !campsiteId.trim().isEmpty()) {
+            try {
+                sql.append(" AND b.campsite_id = ?");
+                params.add(Integer.parseInt(campsiteId));
+            } catch (NumberFormatException e) {
+                // Skip invalid campsite ID filter
+            }
+        }
+        
+        if (dateFrom != null && !dateFrom.trim().isEmpty()) {
+            sql.append(" AND b.booking_date >= ?");
+            params.add(dateFrom);
+        }
+        
+        if (dateTo != null && !dateTo.trim().isEmpty()) {
+            sql.append(" AND b.booking_date <= ?");
+            params.add(dateTo);
+        }
+        
+        if (guestName != null && !guestName.trim().isEmpty()) {
+            sql.append(" AND g.name LIKE ?");
+            params.add("%" + guestName + "%");
+        }
+        
+        sql.append(" ORDER BY b.created_at DESC");
+        
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql.toString())) {
+            
+            for (int i = 0; i < params.size(); i++) {
+                Object param = params.get(i);
+                if (param instanceof String) {
+                    ps.setString(i + 1, (String) param);
+                } else if (param instanceof Integer) {
+                    ps.setInt(i + 1, (Integer) param);
+                }
+            }
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Booking booking = new Booking();
+                    booking.setBookingId(rs.getString("booking_id"));
+                    booking.setGuestId(rs.getInt("guest_id"));
+                    booking.setCampsiteId(rs.getInt("campsite_id"));
+                    booking.setRoomId(rs.getInt("room_id"));
+                    booking.setBookingDate(rs.getDate("booking_date"));
+                    booking.setCheckoutDate(rs.getDate("checkout_date"));
+                    booking.setNumTents(rs.getInt("num_tents"));
+                    booking.setTotalPrice(rs.getBigDecimal("total_price"));
+                    booking.setStatus(rs.getString("status"));
+                    booking.setPaymentStatus(rs.getString("payment_status"));
+                    booking.setCancellationReason(rs.getString("cancellation_reason"));
+                    booking.setCancelledAt(rs.getTimestamp("cancelled_at"));
+                    booking.setCreatedAt(rs.getTimestamp("created_at"));
+                    booking.setUpdatedAt(rs.getTimestamp("updated_at"));
+                    booking.setGuestName(rs.getString("guest_name"));
+                    booking.setGuestIc(rs.getString("guest_ic"));
+                    booking.setGuestPhone(rs.getString("guest_phone"));
+                    booking.setGuestEmail(rs.getString("guest_email"));
+                    booking.setCampsiteName(rs.getString("campsite_name"));
+                    booking.setRoomName(rs.getString("room_name"));
+                    list.add(booking);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }
