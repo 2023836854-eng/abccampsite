@@ -1,52 +1,33 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
-<%@ page import="java.sql.*, java.util.*" %>
+<%@ page import="java.util.*, dao.*, model.*, utils.SessionUtil" %>
 
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>Available Campsites</title>
+<title>Available Rooms</title>
 <style>
 body { font-family: Arial; background: #f0f4f8; padding: 20px; }
 footer { text-align: center; padding: 15px; font-size: 13px; color: #777; margin-top: 20px; }
-.card { border: 1px solid #ccc; padding: 20px; background: white; border-radius: 10px; max-width: 600px; margin: auto; }
+.card { border: 1px solid #ccc; padding: 20px; background: white; border-radius: 10px; max-width: 600px; margin: 20px auto; }
 input[type="submit"] { background-color: #0f9d58; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
 input[type="submit"]:hover { background-color: #0b7a44; }
-input[type="number"] { width: 60px; }
+input[type="number"], input[type="date"] { padding: 8px; border-radius: 5px; border: 1px solid #ccc; }
+.room-info { margin: 10px 0; }
+.room-info p { margin: 5px 0; color: #555; }
+.price { color: #0f9d58; font-weight: bold; font-size: 16px; }
 </style>
 
 <script>
 function checkLoginAndBook(form) {
-    var loggedIn = <%= (session.getAttribute("guestName") != null) ? "true" : "false" %>;
+    var loggedIn = <%= (SessionUtil.isGuestLoggedIn(request)) ? "true" : "false" %>;
     if(!loggedIn){
         alert("You need to login or register first!");
         window.location.href = "login.jsp?redirect=availablerooms.jsp";
         return false;
     }
     return true;
-}
-
-function updateNumTents(selectInput, bookedData, quotaInput, quotaDisplayId, submitButton) {
-    var date = selectInput.value;
-    var booked = bookedData[date] ? bookedData[date] : 0;
-    var quota = parseInt(quotaInput.dataset.quota);
-    var remaining = quota - booked;
-
-    var quotaDisplay = document.getElementById(quotaDisplayId);
-
-    if(remaining <= 0){
-        quotaDisplay.textContent = '0 (Not Available)';
-        quotaInput.value = '';
-        quotaInput.disabled = true;
-        submitButton.disabled = true;
-    } else {
-        quotaDisplay.textContent = remaining;
-        quotaInput.value = 1;
-        quotaInput.max = remaining;
-        quotaInput.disabled = false;
-        submitButton.disabled = false;
-    }
 }
 </script>
 
@@ -62,67 +43,61 @@ if(request.getParameter("campsiteId") != null) {
     selectedCampsiteId = Integer.parseInt(request.getParameter("campsiteId"));
 }
 
-try {
-    Class.forName("com.mysql.cj.jdbc.Driver");
-    Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/abccampsite", "root", "");
+RoomDAO roomDAO = new RoomDAO();
+CampsiteDAO campsiteDAO = new CampsiteDAO();
+List<AvailableRoom> rooms = roomDAO.getActiveByCampsite(selectedCampsiteId);
+Campsite campsite = campsiteDAO.getById(selectedCampsiteId);
 
-    PreparedStatement ps = con.prepareStatement("SELECT * FROM available_rooms WHERE campsite_id=?");
-    ps.setInt(1, selectedCampsiteId);
-    ResultSet rs = ps.executeQuery();
+if (campsite != null) {
+%>
+    <h3 style="text-align: center; color: #333;"><%=campsite.getName()%> - <%=campsite.getLocation()%></h3>
+<%
+}
 
-    while(rs.next()) {
-        int roomId = rs.getInt("room_id");
-        String name = rs.getString("name");
-        String location = rs.getString("location");
-        String description = rs.getString("description");
-        String image = rs.getString("image");
-        double price = rs.getDouble("price_per_tent");
-        int quota = rs.getInt("quota");
-
-        // Get booked tents
-        PreparedStatement psBooked = con.prepareStatement(
-            "SELECT booking_date, SUM(num_tents) AS booked FROM bookings WHERE campsite_id=? GROUP BY booking_date");
-        psBooked.setInt(1, roomId);
-        ResultSet rsBooked = psBooked.executeQuery();
-
-        Map<String,Integer> bookedMap = new HashMap<>();
-        while(rsBooked.next()){
-            bookedMap.put(rsBooked.getDate("booking_date").toString(), rsBooked.getInt("booked"));
-        }
-        rsBooked.close();
-        psBooked.close();
+if (rooms.isEmpty()) {
+%>
+    <div class="card">
+        <p style="text-align: center; color: #777;">No rooms available for this campsite.</p>
+        <a href="index.jsp" style="display: block; text-align: center; margin-top: 10px;">Back to Home</a>
+    </div>
+<%
+} else {
+    for (AvailableRoom room : rooms) {
 %>
 
 <div class="card">
-    <img src="image/<%=image%>" width="100%" height="250px"
+    <% if (room.getImage() != null && !room.getImage().isEmpty()) { %>
+    <img src="image/<%=room.getImage()%>" width="100%" height="250px"
         style="object-fit: cover; border-radius: 10px;">
-    <h3><%=name%></h3>
-    <p>Location: <%=location%></p>
-    <p><%=description%></p>
-    <p>Price per Tent: RM <%=price%></p>
-    <p>Quota: <%=quota%></p>
+    <% } %>
+    <h3><%=room.getName()%></h3>
+    <div class="room-info">
+        <p><strong>Location:</strong> <%=room.getLocation()%></p>
+        <p><strong>Description:</strong> <%=room.getDescription()%></p>
+        <p class="price">Price per Tent: RM <%=String.format("%.2f", room.getPricePerTent())%></p>
+        <p><strong>Available Quota:</strong> <%=room.getAvailableQuota()%> tents</p>
+    </div>
 
-    <form id="form-<%=roomId%>" action="booking.jsp" method="get" onsubmit="return checkLoginAndBook(this);">
-        <input type="hidden" name="roomId" value="<%=roomId%>">
+    <form action="booking.jsp" method="get" onsubmit="return checkLoginAndBook(this);">
+        <input type="hidden" name="roomId" value="<%=room.getRoomId()%>">
+        <input type="hidden" name="campsiteId" value="<%=selectedCampsiteId%>">
         <label>Booking Date:</label> 
-        <input type="date" name="bookingDate" required min="<%=java.time.LocalDate.now()%>" 
-               onchange='updateNumTents(this, <%=bookedMap.toString()%>, this.nextElementSibling, "quota-<%=roomId%>", document.getElementById("submit-<%=roomId%>"))'>
-        <br>
-        <label>Number of Tents:</label>
-        <input type="number" name="numTents" min="1" max="<%=quota%>" required data-quota="<%=quota%>">
+        <input type="date" name="bookingDate" required min="<%=java.time.LocalDate.now()%>">
         <br><br>
-        <input type="submit" id="submit-<%=roomId%>" value="Book Now">
+        <label>Number of Tents:</label>
+        <input type="number" name="numTents" min="1" max="<%=room.getAvailableQuota()%>" value="1" required>
+        <br><br>
+        <% if (room.getAvailableQuota() > 0) { %>
+            <input type="submit" value="Book Now">
+        <% } else { %>
+            <input type="submit" value="Fully Booked" disabled>
+        <% } %>
     </form>
 </div>
 <br>
 
 <%
     }
-    rs.close();
-    ps.close();
-    con.close();
-} catch(Exception e) {
-    out.println("Error: " + e.getMessage());
 }
 %>
 

@@ -265,7 +265,7 @@ if (loggedIn) {
 <div class="sidebar">
     <h2>ABC Campsite</h2>
     <a href="index.jsp">Home</a>
-    <a href="registercustomer.jsp">Sign Up</a>
+    <a href="register.jsp">Sign Up</a>
     <a href="bookinglist.jsp">My Bookings</a>
     <a href="bookingdashboard.jsp" class="active">Dashboard</a>
     <button class="logout-btn" onclick="confirmLogout()">Logout</button>
