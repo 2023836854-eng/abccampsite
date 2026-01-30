@@ -157,8 +157,8 @@ function updateFormAction() {
 			<input type="submit" value="Login">
 		</form>
 
-		<a class="register-link" href="registercustomer.jsp">Don't have an account? Register</a>
-		<a class="register-link" href="forgotpassword.jsp">Forgot Password?</a>
+		<a class="register-link" href="register.jsp">Don't have an account? Register</a>
+		<a class="register-link" href="forgot-password.jsp">Forgot Password?</a>
 
 	</div>
 </body>

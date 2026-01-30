@@ -32,7 +32,7 @@ public class ResetPasswordServlet extends HttpServlet {
             // Validate inputs
             if (token == null || token.trim().isEmpty()) {
                 request.setAttribute("error", "Invalid reset token");
-                request.getRequestDispatcher("forgotpassword.jsp").forward(request, response);
+                request.getRequestDispatcher("forgot-password.jsp").forward(request, response);
                 return;
             }
             
@@ -60,7 +60,7 @@ public class ResetPasswordServlet extends HttpServlet {
             // Validate token
             if (!passwordResetDAO.validateToken(token)) {
                 request.setAttribute("error", "The password reset link is invalid or has expired");
-                request.getRequestDispatcher("forgotpassword.jsp").forward(request, response);
+                request.getRequestDispatcher("forgot-password.jsp").forward(request, response);
                 return;
             }
             
@@ -68,7 +68,7 @@ public class ResetPasswordServlet extends HttpServlet {
             PasswordReset reset = passwordResetDAO.getByToken(token);
             if (reset == null) {
                 request.setAttribute("error", "Invalid reset token");
-                request.getRequestDispatcher("forgotpassword.jsp").forward(request, response);
+                request.getRequestDispatcher("forgot-password.jsp").forward(request, response);
                 return;
             }
             
@@ -93,7 +93,7 @@ public class ResetPasswordServlet extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "An error occurred: " + e.getMessage());
-            request.getRequestDispatcher("forgotpassword.jsp").forward(request, response);
+            request.getRequestDispatcher("forgot-password.jsp").forward(request, response);
         }
     }
 }
