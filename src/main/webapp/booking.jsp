@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
-<%@ page import="dao.*, model.*, utils.SessionUtil, java.math.BigDecimal" %>
+<%@ page import="dao.*, model.*, utils.SessionUtil, java.math.BigDecimal, java.time.LocalDate" %>
 <%
 Integer guestId = SessionUtil.getGuestId(request);
 if (guestId == null) {
@@ -27,10 +27,15 @@ CampsiteDAO campsiteDAO = new CampsiteDAO();
 AvailableRoom room = null;
 Campsite campsite = null;
 BigDecimal totalPrice = BigDecimal.ZERO;
+String checkoutDate = bookingDate;
 
-if (roomId != null && campsiteId != null) {
+if (roomId != null && campsiteId != null && bookingDate != null) {
     room = roomDAO.getById(Integer.parseInt(roomId));
     campsite = campsiteDAO.getById(Integer.parseInt(campsiteId));
+    
+    LocalDate checkIn = LocalDate.parse(bookingDate);
+    LocalDate checkOut = checkIn.plusDays(1);
+    checkoutDate = checkOut.toString();
     
     if (room != null) {
         totalPrice = room.getPricePerTent().multiply(new BigDecimal(numTents));
@@ -63,7 +68,7 @@ form input[type="submit"]:hover { background: #45a049; }
     <input type="hidden" name="campsiteId" value="<%=campsiteId%>">
     <input type="hidden" name="roomId" value="<%=roomId%>">
     <input type="hidden" name="bookingDate" value="<%=bookingDate%>">
-    <input type="hidden" name="checkoutDate" value="<%=bookingDate%>">
+    <input type="hidden" name="checkoutDate" value="<%=checkoutDate%>">
     <input type="hidden" name="numTents" value="<%=numTents%>">
     
     <label>Campsite Name</label> 
