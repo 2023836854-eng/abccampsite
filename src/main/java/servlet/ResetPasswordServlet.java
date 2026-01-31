@@ -3,7 +3,6 @@ package servlet;
 import dao.GuestDAO;
 import dao.PasswordResetDAO;
 import model.PasswordReset;
-import utils.PasswordUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -72,11 +71,8 @@ public class ResetPasswordServlet extends HttpServlet {
                 return;
             }
             
-            // Hash new password
-            String hashedPassword = PasswordUtil.hashPassword(password);
-            
             // Update password
-            boolean updated = guestDAO.updatePassword(reset.getGuestId(), hashedPassword);
+            boolean updated = guestDAO.updatePassword(reset.getGuestId(), password);
             
             if (updated) {
                 // Mark token as used
