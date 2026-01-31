@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.util.*" %>
+<%@ page import="java.util.*, model.Campsite" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -88,23 +88,23 @@
                         </thead>
                         <tbody>
                             <%
-                                List<Map<String, Object>> campsites = 
-                                    (List<Map<String, Object>>) request.getAttribute("campsites");
+                                List<Campsite> campsites = 
+                                    (List<Campsite>) request.getAttribute("campsites");
                                 if(campsites != null && !campsites.isEmpty()) {
-                                    for(Map<String, Object> campsite : campsites) {
-                                        Boolean isActive = (Boolean) campsite.get("isActive");
+                                    for(Campsite campsite : campsites) {
+                                        boolean isActive = campsite.isActive();
                             %>
                             <tr>
-                                <td><strong>#<%= campsite.get("campsiteId") %></strong></td>
+                                <td><strong>#<%= campsite.getCampsiteId() %></strong></td>
                                 <td>
-                                    <img src="<%= campsite.get("imageUrl") != null ? campsite.get("imageUrl") : "../images/default-campsite.jpg" %>" 
+                                    <img src="<%= campsite.getImage() != null && !campsite.getImage().isEmpty() ? campsite.getImage() : "../images/default-campsite.jpg" %>" 
                                          class="campsite-image" alt="Campsite">
                                 </td>
-                                <td><strong><%= campsite.get("campsiteName") %></strong></td>
-                                <td><%= campsite.get("location") %></td>
+                                <td><strong><%= campsite.getName() %></strong></td>
+                                <td><%= campsite.getLocation() %></td>
                                 <td>
                                     <% 
-                                        String desc = (String) campsite.get("description");
+                                        String desc = campsite.getDescription();
                                         if(desc != null && desc.length() > 100) {
                                             out.print(desc.substring(0, 100) + "...");
                                         } else {
@@ -119,15 +119,15 @@
                                 </td>
                                 <td>
                                     <div class="btn-group">
-                                        <a href="${pageContext.request.contextPath}/admin/ManageCampsiteServlet?action=edit&id=<%= campsite.get("campsiteId") %>" 
+                                        <a href="${pageContext.request.contextPath}/admin/ManageCampsiteServlet?action=edit&campsiteId=<%= campsite.getCampsiteId() %>" 
                                            class="btn btn-sm btn-warning action-btn">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <a href="${pageContext.request.contextPath}/admin/ManageCampsiteServlet?action=toggle&id=<%= campsite.get("campsiteId") %>" 
+                                        <a href="${pageContext.request.contextPath}/admin/ManageCampsiteServlet?action=toggle&campsiteId=<%= campsite.getCampsiteId() %>" 
                                            class="btn btn-sm btn-<%= isActive ? "secondary" : "success" %> action-btn">
                                             <i class="fas fa-<%= isActive ? "eye-slash" : "eye" %>"></i>
                                         </a>
-                                        <a href="${pageContext.request.contextPath}/admin/ManageRoomServlet?campsiteId=<%= campsite.get("campsiteId") %>" 
+                                        <a href="${pageContext.request.contextPath}/admin/ManageRoomServlet?campsiteId=<%= campsite.getCampsiteId() %>" 
                                            class="btn btn-sm btn-info action-btn">
                                             <i class="fas fa-bed"></i>
                                         </a>

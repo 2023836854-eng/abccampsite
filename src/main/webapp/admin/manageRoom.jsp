@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.util.*, java.text.*" %>
+<%@ page import="java.util.*, java.text.*, model.AvailableRoom, model.Campsite" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -72,16 +72,16 @@
                         <select name="campsiteId" class="form-select" onchange="this.form.submit()">
                             <option value="">All Campsites</option>
                             <%
-                                List<Map<String, Object>> campsites = 
-                                    (List<Map<String, Object>>) request.getAttribute("campsites");
+                                List<Campsite> campsites = 
+                                    (List<Campsite>) request.getAttribute("campsites");
                                 String selectedCampsite = request.getParameter("campsiteId");
                                 if(campsites != null) {
-                                    for(Map<String, Object> campsite : campsites) {
-                                        int id = (Integer) campsite.get("campsiteId");
+                                    for(Campsite campsite : campsites) {
+                                        int id = campsite.getCampsiteId();
                                         boolean isSelected = selectedCampsite != null && selectedCampsite.equals(String.valueOf(id));
                             %>
                             <option value="<%= id %>" <%= isSelected ? "selected" : "" %>>
-                                <%= campsite.get("campsiteName") %>
+                                <%= campsite.getName() %>
                             </option>
                             <% 
                                     }
@@ -125,24 +125,24 @@
                         </thead>
                         <tbody>
                             <%
-                                List<Map<String, Object>> rooms = 
-                                    (List<Map<String, Object>>) request.getAttribute("rooms");
+                                List<AvailableRoom> rooms = 
+                                    (List<AvailableRoom>) request.getAttribute("rooms");
                                 if(rooms != null && !rooms.isEmpty()) {
-                                    for(Map<String, Object> room : rooms) {
-                                        Boolean isActive = (Boolean) room.get("isActive");
-                                        Integer quota = (Integer) room.get("quota");
-                                        Integer availableQuota = (Integer) room.get("availableQuota");
+                                    for(AvailableRoom room : rooms) {
+                                        boolean isActive = room.isActive();
+                                        int quota = room.getQuota();
+                                        int availableQuota = room.getAvailableQuota();
                             %>
                             <tr>
-                                <td><strong>#<%= room.get("roomId") %></strong></td>
+                                <td><strong>#<%= room.getRoomId() %></strong></td>
                                 <td>
-                                    <img src="<%= room.get("imageUrl") != null ? room.get("imageUrl") : "../images/default-room.jpg" %>" 
+                                    <img src="<%= room.getImage() != null && !room.getImage().isEmpty() ? room.getImage() : "../images/default-room.jpg" %>" 
                                          class="room-image" alt="Room">
                                 </td>
-                                <td><strong><%= room.get("roomName") %></strong></td>
-                                <td><%= room.get("campsiteName") %></td>
-                                <td><%= room.get("location") %></td>
-                                <td><strong>$<%= new DecimalFormat("#,##0.00").format(room.get("pricePerTent")) %></strong></td>
+                                <td><strong><%= room.getName() %></strong></td>
+                                <td><%= room.getCampsiteName() != null ? room.getCampsiteName() : "" %></td>
+                                <td><%= room.getLocation() %></td>
+                                <td><strong>$<%= new DecimalFormat("#,##0.00").format(room.getPricePerTent()) %></strong></td>
                                 <td><%= quota %></td>
                                 <td>
                                     <span class="badge bg-<%= availableQuota > 0 ? "success" : "danger" %>">
@@ -156,11 +156,11 @@
                                 </td>
                                 <td>
                                     <div class="btn-group">
-                                        <a href="${pageContext.request.contextPath}/admin/ManageRoomServlet?action=edit&id=<%= room.get("roomId") %>" 
+                                        <a href="${pageContext.request.contextPath}/admin/ManageRoomServlet?action=edit&roomId=<%= room.getRoomId() %>" 
                                            class="btn btn-sm btn-warning action-btn">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <a href="${pageContext.request.contextPath}/admin/ManageRoomServlet?action=toggle&id=<%= room.get("roomId") %>" 
+                                        <a href="${pageContext.request.contextPath}/admin/ManageRoomServlet?action=toggle&roomId=<%= room.getRoomId() %>" 
                                            class="btn btn-sm btn-<%= isActive ? "secondary" : "success" %> action-btn">
                                             <i class="fas fa-<%= isActive ? "eye-slash" : "eye" %>"></i>
                                         </a>
