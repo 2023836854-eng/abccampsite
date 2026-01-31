@@ -47,13 +47,13 @@ public class BookingServlet extends HttpServlet {
             // Get parameters
             String campsiteIdStr = request.getParameter("campsiteId");
             String roomIdStr = request.getParameter("roomId");
-            String bookingDateStr = request.getParameter("bookingDate");
+            String checkinDateStr = request.getParameter("checkinDate");
             String checkoutDateStr = request.getParameter("checkoutDate");
             String numTentsStr = request.getParameter("numTents");
             
             // Validate inputs
             if (campsiteIdStr == null || roomIdStr == null || 
-                bookingDateStr == null || checkoutDateStr == null || numTentsStr == null) {
+                checkinDateStr == null || checkoutDateStr == null || numTentsStr == null) {
                 request.setAttribute("error", "All fields are required");
                 request.getRequestDispatcher("booking.jsp").forward(request, response);
                 return;
@@ -61,22 +61,22 @@ public class BookingServlet extends HttpServlet {
             
             int campsiteId = Integer.parseInt(campsiteIdStr);
             int roomId = Integer.parseInt(roomIdStr);
-            Date bookingDate = Date.valueOf(bookingDateStr);
+            Date checkinDate = Date.valueOf(checkinDateStr);
             Date checkoutDate = Date.valueOf(checkoutDateStr);
             int numTents = Integer.parseInt(numTentsStr);
             
             // Validate dates
-            LocalDate bookingLocalDate = LocalDate.parse(bookingDateStr);
+            LocalDate checkinLocalDate = LocalDate.parse(checkinDateStr);
             LocalDate checkoutLocalDate = LocalDate.parse(checkoutDateStr);
             
-            if (!checkoutLocalDate.isAfter(bookingLocalDate)) {
-                request.setAttribute("error", "Checkout date must be after booking date");
+            if (!checkoutLocalDate.isAfter(checkinLocalDate)) {
+                request.setAttribute("error", "Checkout date must be after check-in date");
                 request.getRequestDispatcher("booking.jsp").forward(request, response);
                 return;
             }
             
             // Calculate number of days
-            long days = ChronoUnit.DAYS.between(bookingLocalDate, checkoutLocalDate);
+            long days = ChronoUnit.DAYS.between(checkinLocalDate, checkoutLocalDate);
             
             // Get room details
             AvailableRoom room = roomDAO.getById(roomId);
@@ -107,7 +107,7 @@ public class BookingServlet extends HttpServlet {
             booking.setGuestId(guestId);
             booking.setCampsiteId(campsiteId);
             booking.setRoomId(roomId);
-            booking.setBookingDate(bookingDate);
+            booking.setBookingDate(checkinDate);  // booking_date is check-in date
             booking.setCheckoutDate(checkoutDate);
             booking.setNumTents(numTents);
             booking.setTotalPrice(totalPrice);
@@ -122,8 +122,8 @@ public class BookingServlet extends HttpServlet {
                 boolean quotaUpdated = roomDAO.updateQuota(roomId, -numTents);
                 
                 if (quotaUpdated) {
-                    // Redirect to payment page
-                    response.sendRedirect("payment.jsp?bookingId=" + bookingId);
+                    // Redirect to booking confirmation page
+                    response.sendRedirect("bookingconfirmation.jsp?bookingId=" + bookingId);
                 } else {
                     request.setAttribute("error", "Failed to update room quota");
                     request.getRequestDispatcher("booking.jsp").forward(request, response);

@@ -32,23 +32,6 @@ h2 {
 	color: #08331c;
 }
 
-.user-type {
-	margin: 20px 0;
-	text-align: left;
-	padding-left: 20px;
-}
-
-.user-type label {
-	margin-right: 20px;
-	font-size: 14px;
-	cursor: pointer;
-}
-
-.user-type input[type="radio"] {
-	margin-right: 5px;
-	cursor: pointer;
-}
-
 form input[type="text"], form input[type="password"] {
 	width: 90%;
 	padding: 10px;
@@ -104,19 +87,27 @@ form input[type="submit"]:hover {
 .register-link:hover {
 	color: #1976D2;
 }
-</style>
-<script>
-function updateFormAction() {
-	var form = document.getElementById("loginForm");
-	var userType = document.querySelector('input[name="userType"]:checked').value;
-	
-	if (userType === "guest") {
-		form.action = "LoginServlet";
-	} else {
-		form.action = "AdminLoginServlet";
-	}
+
+.admin-login-btn {
+	display: block;
+	width: 95%;
+	margin: 15px auto 0;
+	padding: 12px 20px;
+	background-color: #2196F3;
+	color: white;
+	text-align: center;
+	text-decoration: none;
+	border-radius: 6px;
+	font-size: 16px;
+	font-weight: bold;
+	cursor: pointer;
 }
-</script>
+
+.admin-login-btn:hover {
+	background-color: #1976D2;
+}
+</style>
+
 </head>
 <body>
 	<div class="login-container">
@@ -141,21 +132,12 @@ function updateFormAction() {
 		%>
 
 		<form id="loginForm" action="LoginServlet" method="post">
-			<div class="user-type">
-				<label>
-					<input type="radio" name="userType" value="guest" checked onchange="updateFormAction()">
-					Guest
-				</label>
-				<label>
-					<input type="radio" name="userType" value="admin" onchange="updateFormAction()">
-					Admin
-				</label>
-			</div>
-			
 			IC Number: <input type="text" name="ic" required><br>
 			Password: <input type="password" name="password" required><br>
 			<input type="submit" value="Login">
 		</form>
+
+		<a class="admin-login-btn" href="admin/login.jsp">Admin Login</a>
 
 		<a class="register-link" href="register.jsp">Don't have an account? Register</a>
 		<a class="register-link" href="forgot-password.jsp">Forgot Password?</a>

@@ -49,7 +49,7 @@ tr:nth-child(even) {
 	background: #f9f9f9;
 }
 
-a.view-btn, a.cancel-btn {
+a.view-btn, a.cancel-btn, a.pay-btn {
 	padding: 5px 10px;
 	text-decoration: none;
 	color: #fff;
@@ -64,6 +64,10 @@ a.view-btn {
 
 a.cancel-btn {
 	background: #f44336;
+}
+
+a.pay-btn {
+	background: #4CAF50;
 }
 
 .message {
@@ -94,6 +98,13 @@ a.cancel-btn {
 .status-completed { background: #9e9e9e; color: #fff; }
 .status-cancelled { background: #e57373; color: #fff; }
 </style>
+<script>
+function cancelBooking(bookingId) {
+	if (confirm('Are you sure you want to cancel this booking?')) {
+		window.location.href = 'UpdateBookingServlet?action=cancel&bookingId=' + bookingId;
+	}
+}
+</script>
 </head>
 <body>
 	<%@ include file="header.jsp"%>
@@ -115,16 +126,18 @@ a.cancel-btn {
 				<th>Booking ID</th>
 				<th>Campsite</th>
 				<th>Room</th>
-				<th>Booking Date</th>
-				<th>Number of Tents</th>
+				<th>Check-in Date</th>
+				<th>Check-out Date</th>
+				<th>Tents</th>
 				<th>Total Price (RM)</th>
 				<th>Status</th>
+				<th>Payment</th>
 				<th>Action</th>
 			</tr>
 
 			<%
 			if (bookings.isEmpty()) {
-				out.println("<tr><td colspan='8'>No bookings found.</td></tr>");
+				out.println("<tr><td colspan='10'>No bookings found.</td></tr>");
 			} else {
 				for (Booking booking : bookings) {
 					String statusClass = "status-pending";
@@ -135,22 +148,31 @@ a.cancel-btn {
 					else if ("Cancelled".equalsIgnoreCase(status)) statusClass = "status-cancelled";
 					
 					boolean canCancel = ("Pending".equalsIgnoreCase(status) || "Confirmed".equalsIgnoreCase(status));
+					boolean canPay = "Unpaid".equalsIgnoreCase(booking.getPaymentStatus()) && 
+					                 !"Cancelled".equalsIgnoreCase(status);
 			%>
 			<tr>
 				<td><%=booking.getBookingId()%></td>
 				<td><%=booking.getCampsiteName()%></td>
 				<td><%=booking.getRoomName()%></td>
 				<td><%=booking.getBookingDate()%></td>
+				<td><%=booking.getCheckoutDate()%></td>
 				<td><%=booking.getNumTents()%></td>
 				<td><%=String.format("%.2f", booking.getTotalPrice())%></td>
 				<td><span class="status-badge <%=statusClass%>"><%=status%></span></td>
+				<td><%=booking.getPaymentStatus()%></td>
 				<td>
 					<a class="view-btn" href="receipt.jsp?bookingId=<%=booking.getBookingId()%>">View Receipt</a>
 					<%
+					if (canPay) {
+					%>
+						<a class="pay-btn" href="payment.jsp?bookingId=<%=booking.getBookingId()%>">Pay</a>
+					<%
+					}
 					if (canCancel) {
 					%>
-						<a class="cancel-btn" href="cancelbooking.jsp?id=<%=booking.getBookingId()%>"
-						   onclick="return confirm('Are you sure you want to cancel this booking?');">Cancel</a>
+						<a class="cancel-btn" href="javascript:void(0);"
+						   onclick="cancelBooking('<%=booking.getBookingId()%>')">Cancel</a>
 					<%
 					}
 					%>

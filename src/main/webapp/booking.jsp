@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
-<%@ page import="dao.*, model.*, utils.SessionUtil, java.math.BigDecimal, java.time.LocalDate" %>
+<%@ page import="dao.*, model.*, utils.SessionUtil, java.math.BigDecimal, java.time.LocalDate, java.time.temporal.ChronoUnit" %>
 <%
 Integer guestId = SessionUtil.getGuestId(request);
 if (guestId == null) {
@@ -17,7 +17,8 @@ if (guest == null) {
 
 String roomId = request.getParameter("roomId");
 String campsiteId = request.getParameter("campsiteId");
-String bookingDate = request.getParameter("bookingDate");
+String checkinDate = request.getParameter("checkinDate");
+String checkoutDate = request.getParameter("checkoutDate");
 String numTentsStr = request.getParameter("numTents");
 int numTents = (numTentsStr != null) ? Integer.parseInt(numTentsStr) : 1;
 
@@ -27,18 +28,22 @@ CampsiteDAO campsiteDAO = new CampsiteDAO();
 AvailableRoom room = null;
 Campsite campsite = null;
 BigDecimal totalPrice = BigDecimal.ZERO;
-String checkoutDate = bookingDate;
+long numDays = 1;
 
-if (roomId != null && campsiteId != null && bookingDate != null) {
+if (roomId != null && campsiteId != null && checkinDate != null && checkoutDate != null) {
     room = roomDAO.getById(Integer.parseInt(roomId));
     campsite = campsiteDAO.getById(Integer.parseInt(campsiteId));
     
-    LocalDate checkIn = LocalDate.parse(bookingDate);
-    LocalDate checkOut = checkIn.plusDays(1);
-    checkoutDate = checkOut.toString();
+    LocalDate checkIn = LocalDate.parse(checkinDate);
+    LocalDate checkOut = LocalDate.parse(checkoutDate);
+    numDays = ChronoUnit.DAYS.between(checkIn, checkOut);
+    
+    if (numDays <= 0) {
+        numDays = 1;
+    }
     
     if (room != null) {
-        totalPrice = room.getPricePerTent().multiply(new BigDecimal(numTents));
+        totalPrice = room.getPricePerTent().multiply(new BigDecimal(numTents)).multiply(new BigDecimal(numDays));
     }
 }
 %>
@@ -53,10 +58,13 @@ body { font-family: Arial; background: #f0f4f8; margin: 0; padding: 0; }
 footer { text-align: center; padding: 15px; font-size: 13px; color: #777; margin-top: 20px; }
 h2 { text-align: center; color: #08331c; }
 form input, form select, form textarea { width: 100%; padding: 10px; margin: 10px 0; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; }
-form input[type="submit"] { background: #4CAF50; color: #fff; border: none; cursor: pointer; }
-form input[type="submit"]:hover { background: #45a049; }
+form input[type="submit"], form input[type="button"] { background: #4CAF50; color: #fff; border: none; cursor: pointer; width: 48%; display: inline-block; }
+form input[type="submit"]:hover, form input[type="button"]:hover { background: #45a049; }
+form input[type="button"].cancel-btn { background: #f44336; margin-left: 4%; }
+form input[type="button"].cancel-btn:hover { background: #d32f2f; }
 .payment-box { background: #f7f7f7; padding: 15px; border-radius: 8px; }
 .price-display { background: #e8f5e9; padding: 10px; margin: 10px 0; border-radius: 6px; font-size: 18px; font-weight: bold; color: #2e7d32; }
+.button-group { text-align: center; margin-top: 20px; }
 </style>
 </head>
 <body>
@@ -64,10 +72,10 @@ form input[type="submit"]:hover { background: #45a049; }
 <div class="container">
 <h2>Confirm Your Booking</h2>
 <% if (room != null && campsite != null) { %>
-<form action="BookingServlet" method="post">
+<form action="BookingServlet" method="post" id="bookingForm">
     <input type="hidden" name="campsiteId" value="<%=campsiteId%>">
     <input type="hidden" name="roomId" value="<%=roomId%>">
-    <input type="hidden" name="bookingDate" value="<%=bookingDate%>">
+    <input type="hidden" name="checkinDate" value="<%=checkinDate%>">
     <input type="hidden" name="checkoutDate" value="<%=checkoutDate%>">
     <input type="hidden" name="numTents" value="<%=numTents%>">
     
@@ -80,35 +88,29 @@ form input[type="submit"]:hover { background: #45a049; }
     <label>Location</label> 
     <input type="text" value="<%=room.getLocation()%>" readonly>
     
-    <label>Booking Date</label> 
-    <input type="text" value="<%=bookingDate%>" readonly>
+    <label>Check-in Date</label> 
+    <input type="text" value="<%=checkinDate%>" readonly>
+    
+    <label>Check-out Date</label> 
+    <input type="text" value="<%=checkoutDate%>" readonly>
+    
+    <label>Number of Days</label> 
+    <input type="text" value="<%=numDays%>" readonly>
     
     <label>Number of Tents</label> 
     <input type="text" value="<%=numTents%>" readonly>
     
-    <label>Price per Tent</label> 
+    <label>Price per Tent per Night</label> 
     <input type="text" value="RM <%=String.format("%.2f", room.getPricePerTent())%>" readonly>
     
     <div class="price-display">
         Total Price: RM <%=String.format("%.2f", totalPrice)%>
     </div>
     
-    <label>Your Name</label> 
-    <input type="text" value="<%=guest.getName()%>" readonly>
-    
-    <label>IC Number</label> 
-    <input type="text" value="<%=guest.getIc()%>" readonly>
-    
-    <label>Phone Number</label> 
-    <input type="text" value="<%=guest.getPhone() != null ? guest.getPhone() : ""%>" readonly>
-    
-    <label>Email</label> 
-    <input type="text" value="<%=guest.getEmail()%>" readonly>
-    
-    <label>Address</label>
-    <textarea readonly><%=guest.getAddress() != null ? guest.getAddress() : ""%></textarea>
-    
-    <input type="submit" value="Proceed to Payment">
+    <div class="button-group">
+        <input type="button" value="Cancel" class="cancel-btn" onclick="window.location.href='availablerooms.jsp?campsiteId=<%=campsiteId%>'">
+        <input type="submit" value="Confirm Booking">
+    </div>
 </form>
 <% } else { %>
     <p style="color: red; text-align: center;">Invalid booking details. Please try again.</p>

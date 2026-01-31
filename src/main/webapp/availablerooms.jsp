@@ -81,8 +81,11 @@ if (rooms.isEmpty()) {
     <form action="booking.jsp" method="get" onsubmit="return checkLoginAndBook(this);">
         <input type="hidden" name="roomId" value="<%=room.getRoomId()%>">
         <input type="hidden" name="campsiteId" value="<%=selectedCampsiteId%>">
-        <label>Booking Date:</label> 
-        <input type="date" name="bookingDate" required min="<%=java.time.LocalDate.now()%>">
+        <label>Check-in Date:</label> 
+        <input type="date" name="checkinDate" required min="<%=java.time.LocalDate.now()%>">
+        <br><br>
+        <label>Check-out Date:</label> 
+        <input type="date" name="checkoutDate" required min="<%=java.time.LocalDate.now().plusDays(1)%>">
         <br><br>
         <label>Number of Tents:</label>
         <input type="number" name="numTents" min="1" max="<%=room.getAvailableQuota()%>" value="1" required>
