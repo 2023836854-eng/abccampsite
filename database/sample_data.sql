@@ -8,11 +8,10 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 -- Sample Admins
 -- --------------------------------------------------------
--- Password: admin123 (hashed with SHA-256)
--- Note: For actual implementation, ensure hashing matches PasswordUtil (currently SHA-256)
+-- Password: admin123 (plain text - as per requirements)
 INSERT INTO `admins` (`admin_id`, `username`, `password`, `full_name`, `email`, `role`, `is_active`) VALUES
-(1, 'admin', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'System Administrator', 'admin@abccampsite.com', 'Admin', 1),
-(2, 'staff1', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Staff Member One', 'staff1@abccampsite.com', 'Staff', 1);
+(1, 'admin', 'admin123', 'System Administrator', 'admin@abccampsite.com', 'Admin', 1),
+(2, 'staff1', 'staff123', 'Staff Member One', 'staff1@abccampsite.com', 'Staff', 1);
 
 -- --------------------------------------------------------
 -- Sample Campsites
