@@ -19,6 +19,12 @@ public class UpdateBookingServlet extends HttpServlet {
     private RoomDAO roomDAO = new RoomDAO();
 
     @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        doPost(request, response);
+    }
+    
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
@@ -63,7 +69,7 @@ public class UpdateBookingServlet extends HttpServlet {
         }
         
         if (cancellationReason == null || cancellationReason.trim().isEmpty()) {
-            cancellationReason = "No reason provided";
+            cancellationReason = "Cancelled by guest";
         }
         
         // Get booking details before cancellation
@@ -96,16 +102,16 @@ public class UpdateBookingServlet extends HttpServlet {
             
             // Redirect based on user type
             if (SessionUtil.isAdminLoggedIn(request)) {
-                response.sendRedirect("admin/bookings.jsp?message=Booking cancelled successfully");
+                response.sendRedirect("admin/ManageBookingServlet?message=Booking cancelled successfully");
             } else {
-                response.sendRedirect("bookings.jsp?message=Booking cancelled successfully");
+                response.sendRedirect("bookinglist.jsp?msg=cancelled");
             }
         } else {
             request.setAttribute("error", "Failed to cancel booking");
             if (SessionUtil.isAdminLoggedIn(request)) {
-                response.sendRedirect("admin/bookings.jsp");
+                response.sendRedirect("admin/ManageBookingServlet?error=Failed to cancel booking");
             } else {
-                response.sendRedirect("bookings.jsp");
+                response.sendRedirect("bookinglist.jsp?msg=error");
             }
         }
     }

@@ -49,9 +49,9 @@ CREATE TABLE IF NOT EXISTS `admins` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Create default admin account if not exists
--- Password: admin123 (hash should be properly generated with BCrypt)
+-- Password: admin123 (plain text - as per requirements)
 INSERT INTO `admins` (`username`, `password`, `full_name`, `email`, `role`, `is_active`)
-SELECT 'admin', '$2a$10$YQlDfJKL3QjKgM4H0w5lLe0vKJFdJYzV8qQ7.x1zj8qY7.Y1zj8qY', 'Administrator', 'admin@abccampsite.com', 'Admin', 1
+SELECT 'admin', 'admin123', 'Administrator', 'admin@abccampsite.com', 'Admin', 1
 WHERE NOT EXISTS (SELECT 1 FROM `admins` WHERE `username` = 'admin');
 
 -- Create payments table

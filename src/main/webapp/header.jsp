@@ -107,7 +107,6 @@ nav a.active {
         <a href="index.jsp" class="<%= currentPage.equals("index.jsp") ? "active" : "" %>">Home</a>
         <a href="register.jsp" class="<%= currentPage.equals("register.jsp") ? "active" : "" %>">Sign Up</a>
         <a href="bookinglist.jsp" class="<%= currentPage.equals("bookinglist.jsp") ? "active" : "" %>">Booking</a>
-        <a href="dashboard.jsp" class="<%= currentPage.equals("dashboard.jsp") ? "active" : "" %>">Dashboard</a>
     </nav>
 </header>
 
