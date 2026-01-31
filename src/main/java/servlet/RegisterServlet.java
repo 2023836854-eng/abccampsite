@@ -2,7 +2,6 @@ package servlet;
 
 import dao.GuestDAO;
 import model.Guest;
-import utils.PasswordUtil;
 import utils.SessionUtil;
 import utils.ValidationUtil;
 
@@ -71,9 +70,6 @@ public class RegisterServlet extends HttpServlet {
                 return;
             }
             
-            // Hash password
-            String hashedPassword = PasswordUtil.hashPassword(password);
-            
             // Create Guest object
             Guest guest = new Guest();
             guest.setName(name);
@@ -86,7 +82,7 @@ public class RegisterServlet extends HttpServlet {
                 guest.setDob(Date.valueOf(dobStr));
             }
             
-            guest.setPassword(hashedPassword);
+            guest.setPassword(password);
             
             // Register guest
             boolean success = guestDAO.register(guest);
