@@ -5,9 +5,9 @@ A comprehensive campsite booking and management system built with Java EE (JSP, 
 ## 🌟 Features
 
 ### Guest Features
-- ✅ User registration with email verification
-- ✅ Secure login with password hashing
-- ✅ Email-based password reset with token validation
+- ✅ User registration
+- ✅ Secure login
+- ✅ Password reset functionality
 - ✅ Browse available campsites and rooms
 - ✅ Book campsites with multiple room options
 - ✅ Secure payment processing
@@ -78,7 +78,6 @@ abccampsite/
 │   │   │   └── AdminAuthFilter.java
 │   │   └── utils/             # Utilities
 │   │       ├── DBConnection.java
-│   │       ├── PasswordUtil.java
 │   │       ├── EmailUtil.java
 │   │       ├── ValidationUtil.java
 │   │       ├── BookingIdGenerator.java
@@ -244,7 +243,7 @@ After importing sample data:
 
 ## 🔒 Security Features
 
-- ✅ Password hashing with SHA-256 and salt
+- ✅ Plaintext password storage (as per requirements)
 - ✅ SQL injection prevention (PreparedStatements)
 - ✅ XSS prevention (input sanitization)
 - ✅ Session timeout (30 minutes)
