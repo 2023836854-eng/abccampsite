@@ -77,4 +77,20 @@ public class BookingIdGenerator {
     public static String generateResetToken() {
         return java.util.UUID.randomUUID().toString().replace("-", "");
     }
+    
+    /**
+     * Generate 5-character TAC code for password reset
+     * Mix of uppercase letters and numbers
+     */
+    public static String generateTacCode() {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        StringBuilder code = new StringBuilder(5);
+        java.util.Random random = new java.util.Random();
+        
+        for (int i = 0; i < 5; i++) {
+            code.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        
+        return code.toString();
+    }
 }
