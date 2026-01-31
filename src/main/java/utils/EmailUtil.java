@@ -44,6 +44,25 @@ public class EmailUtil {
     }
     
     /**
+     * Send password reset TAC code
+     * @param toEmail Recipient email
+     * @param tacCode TAC code
+     * @return true if email sent successfully
+     */
+    public static boolean sendPasswordResetTacCode(String toEmail, String tacCode) {
+        String subject = "Password Reset Verification Code";
+        
+        StringBuilder body = new StringBuilder();
+        body.append("Your verification code is ").append(tacCode).append(".\n\n");
+        body.append("This code will expire in 10 minutes.\n\n");
+        body.append("If you did not request this, please ignore this email.\n\n");
+        body.append("Best regards,\n");
+        body.append("ABC Campsite Team");
+        
+        return sendEmail(toEmail, subject, body.toString());
+    }
+    
+    /**
      * Send booking confirmation email
      */
     public static boolean sendBookingConfirmation(String toEmail, String bookingId, 

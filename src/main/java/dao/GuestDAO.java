@@ -133,6 +133,33 @@ public class GuestDAO {
         return guest;
     }
     
+    public Guest getByIcAndEmail(String ic, String email) {
+        Guest guest = null;
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement("SELECT * FROM guests WHERE ic = ? AND email = ?")) {
+            ps.setString(1, ic);
+            ps.setString(2, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    guest = new Guest();
+                    guest.setGuestId(rs.getInt("guest_id"));
+                    guest.setName(rs.getString("name"));
+                    guest.setIc(rs.getString("ic"));
+                    guest.setPassword(rs.getString("password"));
+                    guest.setPhone(rs.getString("phone"));
+                    guest.setEmail(rs.getString("email"));
+                    guest.setAddress(rs.getString("address"));
+                    guest.setDob(rs.getDate("dob"));
+                    guest.setCreatedAt(rs.getTimestamp("created_at"));
+                    guest.setUpdatedAt(rs.getTimestamp("updated_at"));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return guest;
+    }
+    
     public boolean updateProfile(Guest guest) {
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(

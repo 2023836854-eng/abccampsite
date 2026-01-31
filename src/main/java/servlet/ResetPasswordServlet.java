@@ -14,8 +14,8 @@ import java.io.IOException;
 @WebServlet("/ResetPasswordServlet")
 public class ResetPasswordServlet extends HttpServlet {
 
-    private PasswordResetDAO passwordResetDAO = new PasswordResetDAO();
     private GuestDAO guestDAO = new GuestDAO();
+    private PasswordResetDAO passwordResetDAO = new PasswordResetDAO();
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
@@ -24,72 +24,79 @@ public class ResetPasswordServlet extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         
         try {
-            String token = request.getParameter("token");
-            String password = request.getParameter("password");
+            String code = request.getParameter("code");
+            String newPassword = request.getParameter("newPassword");
             String confirmPassword = request.getParameter("confirmPassword");
             
             // Validate inputs
-            if (token == null || token.trim().isEmpty()) {
-                request.setAttribute("error", "Invalid reset token");
-                request.getRequestDispatcher("forgot-password.jsp").forward(request, response);
+            if (code == null || code.trim().isEmpty()) {
+                request.setAttribute("error", "Verification code is required");
+                request.getRequestDispatcher("verify-code.jsp").forward(request, response);
                 return;
             }
             
-            if (password == null || password.trim().isEmpty()) {
-                request.setAttribute("error", "Password is required");
-                request.setAttribute("token", token);
-                request.getRequestDispatcher("reset-password.jsp").forward(request, response);
+            if (newPassword == null || newPassword.trim().isEmpty()) {
+                request.setAttribute("error", "New password is required");
+                request.getRequestDispatcher("verify-code.jsp").forward(request, response);
                 return;
             }
             
-            if (password.length() < 6) {
-                request.setAttribute("error", "Password must be at least 6 characters");
-                request.setAttribute("token", token);
-                request.getRequestDispatcher("reset-password.jsp").forward(request, response);
-                return;
-            }
-            
-            if (!password.equals(confirmPassword)) {
+            if (!newPassword.equals(confirmPassword)) {
                 request.setAttribute("error", "Passwords do not match");
-                request.setAttribute("token", token);
-                request.getRequestDispatcher("reset-password.jsp").forward(request, response);
+                request.getRequestDispatcher("verify-code.jsp").forward(request, response);
                 return;
             }
             
-            // Validate token
-            if (!passwordResetDAO.validateToken(token)) {
-                request.setAttribute("error", "The password reset link is invalid or has expired");
-                request.getRequestDispatcher("forgot-password.jsp").forward(request, response);
+            if (newPassword.length() < 6) {
+                request.setAttribute("error", "Password must be at least 6 characters");
+                request.getRequestDispatcher("verify-code.jsp").forward(request, response);
                 return;
             }
             
-            // Get reset details
-            PasswordReset reset = passwordResetDAO.getByToken(token);
+            // Validate TAC code (convert to uppercase for comparison)
+            String tacCode = code.trim().toUpperCase();
+            boolean isValid = passwordResetDAO.validateToken(tacCode);
+            
+            if (!isValid) {
+                request.setAttribute("error", "The verification code is invalid or has expired. Please request a new code.");
+                request.getRequestDispatcher("verify-code.jsp").forward(request, response);
+                return;
+            }
+            
+            // Get the password reset record
+            PasswordReset reset = passwordResetDAO.getByToken(tacCode);
+            
             if (reset == null) {
-                request.setAttribute("error", "Invalid reset token");
-                request.getRequestDispatcher("forgot-password.jsp").forward(request, response);
+                request.setAttribute("error", "Invalid verification code");
+                request.getRequestDispatcher("verify-code.jsp").forward(request, response);
                 return;
             }
             
             // Update password
-            boolean updated = guestDAO.updatePassword(reset.getGuestId(), password);
+            boolean passwordUpdated = guestDAO.updatePassword(reset.getGuestId(), newPassword);
             
-            if (updated) {
+            if (passwordUpdated) {
                 // Mark token as used
-                passwordResetDAO.markAsUsed(token);
+                passwordResetDAO.markAsUsed(tacCode);
                 
-                request.setAttribute("success", "Password has been reset successfully! You can now login with your new password.");
-                request.getRequestDispatcher("login.jsp").forward(request, response);
+                request.setAttribute("success", "Your password has been successfully reset.");
+                request.getRequestDispatcher("verify-code.jsp").forward(request, response);
             } else {
-                request.setAttribute("error", "Failed to reset password. Please try again.");
-                request.setAttribute("token", token);
-                request.getRequestDispatcher("reset-password.jsp").forward(request, response);
+                request.setAttribute("error", "Failed to update password. Please try again.");
+                request.getRequestDispatcher("verify-code.jsp").forward(request, response);
             }
             
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "An error occurred: " + e.getMessage());
-            request.getRequestDispatcher("forgot-password.jsp").forward(request, response);
+            request.getRequestDispatcher("verify-code.jsp").forward(request, response);
         }
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        // Redirect to verify code page
+        response.sendRedirect("verify-code.jsp");
     }
 }

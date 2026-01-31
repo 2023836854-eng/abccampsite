@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.util.*, java.text.*" %>
+<%@ page import="java.util.*, java.text.*, model.Booking" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -140,22 +140,22 @@
                         </thead>
                         <tbody>
                             <%
-                                List<Map<String, Object>> bookings = 
-                                    (List<Map<String, Object>>) request.getAttribute("bookings");
+                                List<Booking> bookings = 
+                                    (List<Booking>) request.getAttribute("bookings");
                                 if(bookings != null && !bookings.isEmpty()) {
-                                    for(Map<String, Object> booking : bookings) {
+                                    for(Booking booking : bookings) {
                             %>
                             <tr>
-                                <td><strong>#<%= booking.get("bookingId") %></strong></td>
-                                <td><%= booking.get("guestName") %></td>
-                                <td><%= booking.get("email") %></td>
-                                <td><%= booking.get("campsiteName") %></td>
-                                <td><%= booking.get("roomName") %></td>
-                                <td><%= booking.get("checkinDate") %></td>
-                                <td><%= booking.get("checkoutDate") %></td>
+                                <td><strong>#<%= booking.getBookingId() %></strong></td>
+                                <td><%= booking.getGuestName() %></td>
+                                <td><%= booking.getGuestEmail() %></td>
+                                <td><%= booking.getCampsiteName() %></td>
+                                <td><%= booking.getRoomName() %></td>
+                                <td><%= booking.getBookingDate() %></td>
+                                <td><%= booking.getCheckoutDate() %></td>
                                 <td>
                                     <% 
-                                        String status = (String) booking.get("bookingStatus");
+                                        String status = booking.getStatus();
                                         String statusClass = "secondary";
                                         if("confirmed".equalsIgnoreCase(status)) statusClass = "success";
                                         else if("pending".equalsIgnoreCase(status)) statusClass = "warning";
@@ -166,27 +166,27 @@
                                 </td>
                                 <td>
                                     <% 
-                                        String paymentStatus = (String) booking.get("paymentStatus");
+                                        String paymentStatus = booking.getPaymentStatus();
                                         String paymentClass = "secondary";
                                         if("paid".equalsIgnoreCase(paymentStatus)) paymentClass = "success";
                                         else if("pending".equalsIgnoreCase(paymentStatus)) paymentClass = "warning";
                                     %>
                                     <span class="badge bg-<%= paymentClass %>"><%= paymentStatus %></span>
                                 </td>
-                                <td><strong>$<%= new DecimalFormat("#,##0.00").format(booking.get("totalAmount")) %></strong></td>
+                                <td><strong>$<%= new DecimalFormat("#,##0.00").format(booking.getTotalPrice()) %></strong></td>
                                 <td>
                                     <div class="btn-group">
                                         <button class="btn btn-sm btn-info action-btn" 
-                                                onclick="viewBooking(<%= booking.get("bookingId") %>)">
+                                                onclick="viewBooking('<%= booking.getBookingId() %>')">
                                             <i class="fas fa-eye"></i>
                                         </button>
                                         <% if(!"cancelled".equalsIgnoreCase(status) && !"completed".equalsIgnoreCase(status)) { %>
                                         <button class="btn btn-sm btn-warning action-btn" 
-                                                onclick="updateStatus(<%= booking.get("bookingId") %>)">
+                                                onclick="updateStatus('<%= booking.getBookingId() %>')">
                                             <i class="fas fa-edit"></i>
                                         </button>
                                         <button class="btn btn-sm btn-danger action-btn" 
-                                                onclick="cancelBooking(<%= booking.get("bookingId") %>)">
+                                                onclick="cancelBooking('<%= booking.getBookingId() %>')">
                                             <i class="fas fa-times"></i>
                                         </button>
                                         <% } %>
