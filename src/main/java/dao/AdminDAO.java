@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import model.Admin;
 import utils.DBConnection;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.nio.charset.StandardCharsets;
 
 public class AdminDAO {
     
@@ -14,7 +17,8 @@ public class AdminDAO {
              PreparedStatement ps = con.prepareStatement(
                  "SELECT * FROM admins WHERE username = ? AND password = ? AND is_active = 1")) {
             ps.setString(1, username);
-            ps.setString(2, password);
+            // Hash the password using SHA-256 before comparing
+            ps.setString(2, hashPasswordSHA256(password));
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     admin = new Admin();
@@ -33,6 +37,27 @@ public class AdminDAO {
             e.printStackTrace();
         }
         return admin;
+    }
+    
+    /**
+     * Hash password using SHA-256 (for compatibility with existing data)
+     * Note: This is for compatibility with sample data that uses simple SHA-256.
+     * TODO: Migrate to bcrypt for improved security
+     */
+    private String hashPasswordSHA256(String password) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] hash = md.digest(password.getBytes(StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Error hashing password", e);
+        }
     }
     
     public Admin getById(int adminId) {
