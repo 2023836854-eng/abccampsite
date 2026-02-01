@@ -13,7 +13,7 @@ public class ValidationUtil {
     );
     
     // IC number pattern (Malaysian IC: YYMMDDPB###G - without dashes)
-    // 12 digits: YYMMDD (6) + PB (2) + #### (4)
+    // 12 digits: YYMMDD (6) + PB (2) + ###G (4 including check digit)
     private static final Pattern IC_PATTERN = Pattern.compile(
         "^\\d{12}$"
     );
