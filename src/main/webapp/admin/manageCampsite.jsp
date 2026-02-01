@@ -131,7 +131,7 @@
                                            class="btn btn-sm btn-info action-btn">
                                             <i class="fas fa-bed"></i>
                                         </a>
-                                        <button onclick="deleteCampsite(<%= campsite.get("campsiteId") %>)" 
+                                        <button onclick="deleteCampsite(<%= campsite.getCampsiteId() %>)" 
                                                 class="btn btn-sm btn-danger action-btn">
                                             <i class="fas fa-trash"></i>
                                         </button>

@@ -164,7 +164,7 @@
                                            class="btn btn-sm btn-<%= isActive ? "secondary" : "success" %> action-btn">
                                             <i class="fas fa-<%= isActive ? "eye-slash" : "eye" %>"></i>
                                         </a>
-                                        <button onclick="deleteRoom(<%= room.get("roomId") %>)" 
+                                        <button onclick="deleteRoom(<%= room.getRoomId() %>)" 
                                                 class="btn btn-sm btn-danger action-btn">
                                             <i class="fas fa-trash"></i>
                                         </button>

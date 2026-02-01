@@ -12,14 +12,16 @@ public class ValidationUtil {
         "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$"
     );
     
-    // IC number pattern (Malaysian IC: YYMMDD-PB-###G)
+    // IC number pattern (Malaysian IC: YYMMDDPB###G - without dashes)
+    // 12 digits: YYMMDD (6) + PB (2) + ###G (4 including check digit)
     private static final Pattern IC_PATTERN = Pattern.compile(
-        "^\\d{6}-\\d{2}-\\d{4}$"
+        "^\\d{12}$"
     );
     
-    // Phone number pattern (Malaysian format)
+    // Phone number pattern (Malaysian format - without dashes)
+    // Mobile: 01X-XXXXXXX or 01X-XXXXXXXX (10 or 11 digits total)
     private static final Pattern PHONE_PATTERN = Pattern.compile(
-        "^01[0-9]-\\d{7,8}$|^\\+6[0-9]{1,2}-\\d{7,9}$"
+        "^01[0-9]\\d{7}$|^01[0-9]\\d{8}$"
     );
     
     /**
@@ -41,7 +43,7 @@ public class ValidationUtil {
      */
     public static boolean isValidPhone(String phone) {
         if (phone == null) return false;
-        // Allow both formats: 012-3456789 or +60-123456789
+        // Malaysian mobile format: 01XXXXXXXXX (10-11 digits without dashes)
         return PHONE_PATTERN.matcher(phone).matches();
     }
     

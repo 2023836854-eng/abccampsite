@@ -39,7 +39,7 @@
 			<td><%=c.getId()%></td>
 			<td><%=c.getName()%></td>
 			<td><%=c.getEmail()%></td>
-			<td><%=c.getPhone()%></td>
+			<td><%=c.getPhone() != null ? c.getPhone().replace("-", "") : ""%></td>
 			<td>
 				<form action="customerservlet" method="post"
 					style="display: inline;">
