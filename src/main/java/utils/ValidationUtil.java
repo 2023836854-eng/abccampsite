@@ -19,9 +19,9 @@ public class ValidationUtil {
     );
     
     // Phone number pattern (Malaysian format - without dashes)
-    // Mobile: 01X-XXXXXXX or 01X-XXXXXXXX (10 or 11 digits)
+    // Mobile: 01X-XXXXXXX or 01X-XXXXXXXX (10 or 11 digits total)
     private static final Pattern PHONE_PATTERN = Pattern.compile(
-        "^01[0-9]\\d{7,8}$"
+        "^01[0-9]\\d{7}$|^01[0-9]\\d{8}$"
     );
     
     /**
