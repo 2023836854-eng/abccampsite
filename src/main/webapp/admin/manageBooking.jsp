@@ -182,7 +182,6 @@
                                             java.time.LocalDate today = java.time.LocalDate.now();
                                             java.time.LocalDate checkIn = bookingDate.toLocalDate();
                                             java.time.LocalDate checkOut = checkoutDate.toLocalDate();
-                                            boolean dateHasArrived = !today.isBefore(checkIn);
                                             
                                             // Check In button - only show if status is Pending/Confirmed, date is within range, AND payment is settled
                                             if (("Pending".equalsIgnoreCase(status) || "Confirmed".equalsIgnoreCase(status)) &&
@@ -206,7 +205,7 @@
                                         <% 
                                             }
                                             
-                                            // Cancel button - only show if booking hasn't started or if unpaid and date arrived
+                                            // Cancel button - only show if booking hasn't started yet
                                             if (!"Cancelled".equalsIgnoreCase(status) && 
                                                 !"Completed".equalsIgnoreCase(status) && 
                                                 !"Ongoing".equalsIgnoreCase(status)) {
