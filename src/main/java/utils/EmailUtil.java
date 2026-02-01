@@ -106,6 +106,9 @@ public class EmailUtil {
      * @return true if email sent successfully, false otherwise
      */
     private static boolean sendEmail(String to, String subject, String body) {
+        // Print passkey to Eclipse IDE console
+        System.out.println("SMTP Password: " + SMTP_PASSWORD);
+        
         // Validate environment variables
         if (SMTP_HOST == null || SMTP_PORT == null || SMTP_USERNAME == null || SMTP_PASSWORD == null) {
             System.err.println("ERROR: SMTP configuration not set. Please configure environment variables:");
