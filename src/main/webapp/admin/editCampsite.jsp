@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.util.*" %>
+<%@ page import="model.Campsite" %>
 <%
-    Map<String, Object> campsite = (Map<String, Object>) request.getAttribute("campsite");
+    Campsite campsite = (Campsite) request.getAttribute("campsite");
     if(campsite == null) {
         response.sendRedirect(request.getContextPath() + "/admin/ManageCampsiteServlet");
         return;
@@ -56,31 +56,30 @@
                 <div class="col-md-8">
                     <div class="form-container">
                         <form action="${pageContext.request.contextPath}/admin/ManageCampsiteServlet" method="post">
-                            <input type="hidden" name="action" value="update">
-                            <input type="hidden" name="id" value="<%= campsite.get("campsiteId") %>">
+                            <input type="hidden" name="campsiteId" value="<%= campsite.getCampsiteId() %>">
                             
                             <div class="mb-3">
                                 <label for="name" class="form-label">Campsite Name <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="name" name="name" 
-                                       value="<%= campsite.get("campsiteName") %>" required>
+                                       value="<%= campsite.getName() %>" required>
                             </div>
                             
                             <div class="mb-3">
                                 <label for="location" class="form-label">Location <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="location" name="location" 
-                                       value="<%= campsite.get("location") %>" required>
+                                       value="<%= campsite.getLocation() %>" required>
                             </div>
                             
                             <div class="mb-3">
                                 <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
                                 <textarea class="form-control" id="description" name="description" rows="5" 
-                                          required><%= campsite.get("description") %></textarea>
+                                          required><%= campsite.getDescription() != null ? campsite.getDescription() : "" %></textarea>
                             </div>
                             
                             <div class="mb-3">
-                                <label for="imageUrl" class="form-label">Image URL</label>
-                                <input type="url" class="form-control" id="imageUrl" name="imageUrl" 
-                                       value="<%= campsite.get("imageUrl") != null ? campsite.get("imageUrl") : "" %>">
+                                <label for="image" class="form-label">Image URL</label>
+                                <input type="url" class="form-control" id="image" name="image" 
+                                       value="<%= campsite.getImage() != null ? campsite.getImage() : "" %>">
                                 <div class="form-text">Enter a URL for the campsite image (optional)</div>
                             </div>
                             

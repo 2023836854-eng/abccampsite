@@ -69,13 +69,16 @@ public class ManageCampsiteServlet extends HttpServlet {
                     
                 case "delete":
                     // Delete campsite
-                    String deleteIdStr = request.getParameter("campsiteId");
+                    String deleteIdStr = request.getParameter("id");
+                    if (deleteIdStr == null || deleteIdStr.trim().isEmpty()) {
+                        deleteIdStr = request.getParameter("campsiteId");
+                    }
                     if (deleteIdStr != null && !deleteIdStr.trim().isEmpty()) {
                         int campsiteId = Integer.parseInt(deleteIdStr);
                         boolean deleted = campsiteDAO.delete(campsiteId);
                         String message = deleted ? "Campsite deleted successfully" : 
                                                   "Failed to delete campsite";
-                        response.sendRedirect("ManageCampsiteServlet?message=" + 
+                        response.sendRedirect("ManageCampsiteServlet?success=" + 
                                             java.net.URLEncoder.encode(message, "UTF-8"));
                     } else {
                         response.sendRedirect("ManageCampsiteServlet?error=" + 
@@ -91,7 +94,7 @@ public class ManageCampsiteServlet extends HttpServlet {
                         boolean toggled = campsiteDAO.toggleActive(campsiteId);
                         String message = toggled ? "Campsite status updated successfully" : 
                                                   "Failed to update campsite status";
-                        response.sendRedirect("ManageCampsiteServlet?message=" + 
+                        response.sendRedirect("ManageCampsiteServlet?success=" + 
                                             java.net.URLEncoder.encode(message, "UTF-8"));
                     } else {
                         response.sendRedirect("ManageCampsiteServlet?error=" + 
@@ -168,7 +171,7 @@ public class ManageCampsiteServlet extends HttpServlet {
             }
             
             // Redirect to list with message
-            response.sendRedirect("ManageCampsiteServlet?message=" + 
+            response.sendRedirect("ManageCampsiteServlet?success=" + 
                                 java.net.URLEncoder.encode(message, "UTF-8"));
             
         } catch (NumberFormatException e) {

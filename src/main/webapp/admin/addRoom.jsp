@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.util.*" %>
+<%@ page import="java.util.*, model.Campsite, dao.CampsiteDAO" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -49,20 +49,20 @@
                 <div class="col-md-8">
                     <div class="form-container">
                         <form action="${pageContext.request.contextPath}/admin/ManageRoomServlet" method="post">
-                            <input type="hidden" name="action" value="add">
                             
                             <div class="mb-3">
                                 <label for="campsiteId" class="form-label">Campsite <span class="text-danger">*</span></label>
                                 <select class="form-select" id="campsiteId" name="campsiteId" required>
                                     <option value="">Select a campsite</option>
                                     <%
-                                        List<Map<String, Object>> campsites = 
-                                            (List<Map<String, Object>>) request.getAttribute("campsites");
+                                        // Load campsites from database
+                                        CampsiteDAO campsiteDAO = new CampsiteDAO();
+                                        List<Campsite> campsites = campsiteDAO.getAll();
                                         if(campsites != null) {
-                                            for(Map<String, Object> campsite : campsites) {
+                                            for(Campsite campsite : campsites) {
                                     %>
-                                    <option value="<%= campsite.get("campsiteId") %>">
-                                        <%= campsite.get("campsiteName") %> - <%= campsite.get("location") %>
+                                    <option value="<%= campsite.getCampsiteId() %>">
+                                        <%= campsite.getName() %> - <%= campsite.getLocation() %>
                                     </option>
                                     <% 
                                             }
@@ -72,8 +72,8 @@
                             </div>
                             
                             <div class="mb-3">
-                                <label for="roomName" class="form-label">Room Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="roomName" name="roomName" 
+                                <label for="name" class="form-label">Room Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="name" name="name" 
                                        placeholder="Enter room name (e.g., Room A1, Lakeside Room)" required>
                             </div>
                             
@@ -90,8 +90,8 @@
                             </div>
                             
                             <div class="mb-3">
-                                <label for="imageUrl" class="form-label">Image URL</label>
-                                <input type="url" class="form-control" id="imageUrl" name="imageUrl" 
+                                <label for="image" class="form-label">Image URL</label>
+                                <input type="url" class="form-control" id="image" name="image" 
                                        placeholder="https://example.com/room-image.jpg">
                                 <div class="form-text">Enter a URL for the room image (optional)</div>
                             </div>
