@@ -1,23 +1,11 @@
 package utils;
 
-import javax.mail.*;
-import javax.mail.internet.*;
-import java.util.Properties;
-
 /**
- * Email utility for sending emails via JavaMail API
- * Uses Gmail SMTP server for sending transactional emails
+ * Email utility for mock email sending
+ * Logs email details to console instead of actually sending emails
  */
 public class EmailUtil {
     
-    // SMTP Configuration (to be configured)
-    // For security, load SMTP settings (especially credentials) from environment variables.
-    // Example environment variables:
-    //   SMTP_HOST, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD
-    private static final String SMTP_HOST = System.getenv("SMTP_HOST");
-    private static final String SMTP_PORT = System.getenv("SMTP_PORT");
-    private static final String SMTP_USERNAME = System.getenv("SMTP_USERNAME");
-    private static final String SMTP_PASSWORD = System.getenv("SMTP_PASSWORD");
     private static final String FROM_EMAIL = "noreply@abccampsite.com";
     private static final String FROM_NAME = "ABC Campsite System";
     
@@ -99,67 +87,21 @@ public class EmailUtil {
     }
     
     /**
-     * Generic email sending method using JavaMail API
+     * Mock email sending method - logs to console instead of sending actual email
      * @param to Recipient email address
      * @param subject Email subject
      * @param body Email body content
-     * @return true if email sent successfully, false otherwise
+     * @return true (always succeeds in mock mode)
      */
     private static boolean sendEmail(String to, String subject, String body) {
-        // Print passkey to Eclipse IDE console
-        System.out.println("SMTP Password: " + SMTP_PASSWORD);
-        
-        // Validate environment variables
-        if (SMTP_HOST == null || SMTP_PORT == null || SMTP_USERNAME == null || SMTP_PASSWORD == null) {
-            System.err.println("ERROR: SMTP configuration not set. Please configure environment variables:");
-            System.err.println("  SMTP_HOST, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD");
-            System.err.println("Email will not be sent to: " + to);
-            return false;
-        }
-        
-        try {
-            // Configure SMTP properties for Gmail
-            Properties props = new Properties();
-            props.put("mail.smtp.host", SMTP_HOST);
-            props.put("mail.smtp.port", SMTP_PORT);
-            props.put("mail.smtp.auth", "true");
-            props.put("mail.smtp.starttls.enable", "true");
-            props.put("mail.smtp.ssl.trust", SMTP_HOST);
-            props.put("mail.smtp.ssl.protocols", "TLSv1.2");
-            
-            // Create authenticator with credentials
-            Authenticator auth = new Authenticator() {
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(SMTP_USERNAME, SMTP_PASSWORD);
-                }
-            };
-            
-            // Create session with authentication
-            Session session = Session.getInstance(props, auth);
-            
-            // Create email message
-            Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(FROM_EMAIL, FROM_NAME));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
-            message.setSubject(subject);
-            message.setText(body);
-            
-            // Send the email
-            Transport.send(message);
-            
-            System.out.println("Email sent successfully to: " + to);
-            return true;
-            
-        } catch (MessagingException e) {
-            System.err.println("Failed to send email to: " + to);
-            System.err.println("Error: " + e.getMessage());
-            e.printStackTrace();
-            return false;
-        } catch (Exception e) {
-            System.err.println("Unexpected error sending email to: " + to);
-            System.err.println("Error: " + e.getMessage());
-            e.printStackTrace();
-            return false;
-        }
+        System.out.println("========== MOCK EMAIL ==========");
+        System.out.println("From: " + FROM_NAME + " <" + FROM_EMAIL + ">");
+        System.out.println("To: " + to);
+        System.out.println("Subject: " + subject);
+        System.out.println("--------------------------------");
+        System.out.println(body);
+        System.out.println("================================");
+        System.out.println();
+        return true;
     }
 }
