@@ -1,10 +1,12 @@
 package utils;
 
+import javax.mail.*;
+import javax.mail.internet.*;
+import java.util.Properties;
+
 /**
- * Email utility for sending emails
- * Note: This is a placeholder implementation
- * For production, use JavaMail API with proper SMTP configuration
- * TODO: Implement with JavaMail API when email server is configured
+ * Email utility for sending emails via JavaMail API
+ * Uses Gmail SMTP server for sending transactional emails
  */
 public class EmailUtil {
     
@@ -18,30 +20,6 @@ public class EmailUtil {
     private static final String SMTP_PASSWORD = System.getenv("SMTP_PASSWORD");
     private static final String FROM_EMAIL = "noreply@abccampsite.com";
     private static final String FROM_NAME = "ABC Campsite System";
-    
-    /**
-     * Send password reset email
-     * @param toEmail Recipient email
-     * @param resetToken Reset token
-     * @param guestName Guest name
-     * @return true if email sent successfully
-     */
-    public static boolean sendPasswordResetEmail(String toEmail, String resetToken, String guestName) {
-        String subject = "Password Reset Request - ABC Campsite";
-        String resetLink = "http://localhost:8080/abccampsite/resetpassword.jsp?token=" + resetToken;
-        
-        StringBuilder body = new StringBuilder();
-        body.append("Dear ").append(guestName).append(",\n\n");
-        body.append("You have requested to reset your password for ABC Campsite.\n\n");
-        body.append("Please click the link below to reset your password:\n");
-        body.append(resetLink).append("\n\n");
-        body.append("This link will expire in 1 hour.\n\n");
-        body.append("If you did not request this, please ignore this email.\n\n");
-        body.append("Best regards,\n");
-        body.append("ABC Campsite Team");
-        
-        return sendEmail(toEmail, subject, body.toString());
-    }
     
     /**
      * Send password reset TAC code
@@ -121,48 +99,64 @@ public class EmailUtil {
     }
     
     /**
-     * Generic email sending method
-     * TODO: Implement with JavaMail API
+     * Generic email sending method using JavaMail API
+     * @param to Recipient email address
+     * @param subject Email subject
+     * @param body Email body content
+     * @return true if email sent successfully, false otherwise
      */
     private static boolean sendEmail(String to, String subject, String body) {
-        // Placeholder implementation
-        // In production, use JavaMail API:
-        /*
+        // Validate environment variables
+        if (SMTP_HOST == null || SMTP_PORT == null || SMTP_USERNAME == null || SMTP_PASSWORD == null) {
+            System.err.println("ERROR: SMTP configuration not set. Please configure environment variables:");
+            System.err.println("  SMTP_HOST, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD");
+            System.err.println("Email will not be sent to: " + to);
+            return false;
+        }
+        
         try {
+            // Configure SMTP properties for Gmail
             Properties props = new Properties();
             props.put("mail.smtp.host", SMTP_HOST);
             props.put("mail.smtp.port", SMTP_PORT);
             props.put("mail.smtp.auth", "true");
             props.put("mail.smtp.starttls.enable", "true");
+            props.put("mail.smtp.ssl.trust", SMTP_HOST);
+            props.put("mail.smtp.ssl.protocols", "TLSv1.2");
             
-            Session session = Session.getInstance(props, new Authenticator() {
+            // Create authenticator with credentials
+            Authenticator auth = new Authenticator() {
                 protected PasswordAuthentication getPasswordAuthentication() {
                     return new PasswordAuthentication(SMTP_USERNAME, SMTP_PASSWORD);
                 }
-            });
+            };
             
+            // Create session with authentication
+            Session session = Session.getInstance(props, auth);
+            
+            // Create email message
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(FROM_EMAIL, FROM_NAME));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
             message.setSubject(subject);
             message.setText(body);
             
+            // Send the email
             Transport.send(message);
+            
+            System.out.println("Email sent successfully to: " + to);
             return true;
             
+        } catch (MessagingException e) {
+            System.err.println("Failed to send email to: " + to);
+            System.err.println("Error: " + e.getMessage());
+            e.printStackTrace();
+            return false;
         } catch (Exception e) {
+            System.err.println("Unexpected error sending email to: " + to);
+            System.err.println("Error: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
-        */
-        
-        // For now, just log to console
-        System.out.println("=== EMAIL SENT ===");
-        System.out.println("To: " + to);
-        System.out.println("Subject: " + subject);
-        System.out.println("Body: " + body);
-        System.out.println("==================");
-        
-        return true; // Assume success for development
     }
 }
