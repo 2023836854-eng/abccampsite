@@ -177,7 +177,6 @@
                                 <td>
                                     <div class="btn-group">
                                         <% 
-                                            String status = booking.getStatus();
                                             java.sql.Date bookingDate = booking.getBookingDate();
                                             java.sql.Date checkoutDate = booking.getCheckoutDate();
                                             java.time.LocalDate today = java.time.LocalDate.now();
