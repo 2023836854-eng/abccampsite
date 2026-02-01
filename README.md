@@ -14,7 +14,6 @@ A comprehensive campsite booking and management system built with Java EE (JSP, 
 - ✅ View booking history with status tracking
 - ✅ Cancel bookings (with conditions)
 - ✅ Download/print booking receipts
-- ✅ Personal dashboard with statistics
 
 ### Admin Features
 - ✅ Secure admin login (separate from guest)
@@ -172,7 +171,7 @@ After importing sample data:
 - Password: `admin123`
 
 **Sample Guest Account:**
-- IC: `900101-01-1234`
+- IC: `900101011234`
 - Password: `password123`
 
 **⚠️ IMPORTANT:** Change these credentials in production!
@@ -188,7 +187,6 @@ After importing sample data:
    - Password minimum 6 characters
 
 2. **Login:**
-   - Select "Guest" radio button
    - Enter IC and Password
    - Click Login
 
@@ -208,8 +206,8 @@ After importing sample data:
 5. **Password Reset:**
    - Click "Forgot Password"
    - Enter email address
-   - Check email for reset link
-   - Click link and set new password
+   - Check email for reset code
+   - Use code and new password
 
 ### For Admins
 
@@ -243,12 +241,10 @@ After importing sample data:
 
 ## 🔒 Security Features
 
-- ✅ Plaintext password storage (as per requirements)
 - ✅ SQL injection prevention (PreparedStatements)
 - ✅ XSS prevention (input sanitization)
 - ✅ Session timeout (30 minutes)
 - ✅ Authentication filters for protected pages
-- ✅ Token-based password reset (1-hour expiry)
 - ✅ Role-based access control (guest vs admin)
 
 ## 🧪 Testing
@@ -257,7 +253,7 @@ After importing sample data:
 ```
 Pending → Confirmed → Ongoing → Completed
    ↓
-Cancelled (with reason)
+Cancelled
 ```
 
 ### Payment Status Flow
@@ -299,7 +295,7 @@ This project is created for educational purposes (university assignment).
 
 ## 👥 Contributors
 
-- University Assignment Project
+- FARIS - RON HENSEM - AWEK RON
 - ABC Campsite Development Team
 
 ## 📞 Support
