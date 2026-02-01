@@ -44,10 +44,10 @@ INSERT INTO `available_rooms` (`room_id`, `campsite_id`, `name`, `location`, `de
 -- --------------------------------------------------------
 -- Password: password123 (should be hashed in real implementation)
 INSERT INTO `guests` (`guest_id`, `name`, `ic`, `password`, `phone`, `email`, `address`, `dob`) VALUES
-(1, 'Ahmad Bin Abdullah', '900101-01-1234', 'password123', '012-3456789', 'ahmad@example.com', '123 Jalan Merdeka, Kuala Lumpur', '1990-01-01'),
-(2, 'Siti Nurhaliza', '920505-05-5678', 'password123', '013-9876543', 'siti@example.com', '456 Jalan Raja, Petaling Jaya', '1992-05-05'),
-(3, 'Tan Wei Ming', '880808-08-9012', 'password123', '014-5551234', 'wei.ming@example.com', '789 Jalan Ipoh, Ipoh', '1988-08-08'),
-(4, 'Kumar Raj', '950303-03-3456', 'password123', '016-7778888', 'kumar@example.com', '321 Jalan Gombak, Selangor', '1995-03-03');
+(1, 'Ahmad Bin Abdullah', '900101011234', 'password123', '0123456789', 'ahmad@example.com', '123 Jalan Merdeka, Kuala Lumpur', '1990-01-01'),
+(2, 'Siti Nurhaliza', '920505055678', 'password123', '0139876543', 'siti@example.com', '456 Jalan Raja, Petaling Jaya', '1992-05-05'),
+(3, 'Tan Wei Ming', '880808089012', 'password123', '0145551234', 'wei.ming@example.com', '789 Jalan Ipoh, Ipoh', '1988-08-08'),
+(4, 'Kumar Raj', '950303033456', 'password123', '0167778888', 'kumar@example.com', '321 Jalan Gombak, Selangor', '1995-03-03');
 
 -- --------------------------------------------------------
 -- Sample Bookings (Various Statuses)

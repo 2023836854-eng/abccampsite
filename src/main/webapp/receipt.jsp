@@ -262,11 +262,11 @@ Payment payment = paymentDAO.getByBookingId(bookingId);
 			</div>
 			<div class="info-row">
 				<span class="info-label">IC Number:</span>
-				<span class="info-value"><%=booking.getGuestIc() != null ? booking.getGuestIc() : "N/A"%></span>
+				<span class="info-value"><%=booking.getGuestIc() != null ? booking.getGuestIc().replace("-", "") : "N/A"%></span>
 			</div>
 			<div class="info-row">
 				<span class="info-label">Phone:</span>
-				<span class="info-value"><%=booking.getGuestPhone() != null ? booking.getGuestPhone() : "N/A"%></span>
+				<span class="info-value"><%=booking.getGuestPhone() != null ? booking.getGuestPhone().replace("-", "") : "N/A"%></span>
 			</div>
 			<div class="info-row">
 				<span class="info-label">Email:</span>
