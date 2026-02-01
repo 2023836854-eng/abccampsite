@@ -128,6 +128,13 @@ public class ManageBookingServlet extends HttpServlet {
                 return;
             }
             
+            // Check if payment has been settled
+            if (!"Paid".equalsIgnoreCase(booking.getPaymentStatus())) {
+                response.sendRedirect("ManageBookingServlet?error=" + 
+                    java.net.URLEncoder.encode("Check-in not allowed until payment is settled", "UTF-8"));
+                return;
+            }
+            
             // Check if current date is within check-in and check-out range
             LocalDate today = LocalDate.now();
             LocalDate checkInDate = booking.getBookingDate().toLocalDate();

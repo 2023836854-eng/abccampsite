@@ -182,10 +182,12 @@
                                             java.time.LocalDate today = java.time.LocalDate.now();
                                             java.time.LocalDate checkIn = bookingDate.toLocalDate();
                                             java.time.LocalDate checkOut = checkoutDate.toLocalDate();
+                                            boolean dateHasArrived = !today.isBefore(checkIn);
                                             
-                                            // Check In button - only show if status is Pending/Confirmed and date is within range
+                                            // Check In button - only show if status is Pending/Confirmed, date is within range, AND payment is settled
                                             if (("Pending".equalsIgnoreCase(status) || "Confirmed".equalsIgnoreCase(status)) &&
-                                                !today.isBefore(checkIn) && !today.isAfter(checkOut)) {
+                                                !today.isBefore(checkIn) && !today.isAfter(checkOut) &&
+                                                "Paid".equalsIgnoreCase(paymentStatus)) {
                                         %>
                                         <button class="btn btn-sm btn-success action-btn" 
                                                 onclick="checkIn('<%= booking.getBookingId() %>')">
@@ -204,7 +206,7 @@
                                         <% 
                                             }
                                             
-                                            // Cancel button - only show if booking hasn't started yet
+                                            // Cancel button - only show if booking hasn't started or if unpaid and date arrived
                                             if (!"Cancelled".equalsIgnoreCase(status) && 
                                                 !"Completed".equalsIgnoreCase(status) && 
                                                 !"Ongoing".equalsIgnoreCase(status)) {
