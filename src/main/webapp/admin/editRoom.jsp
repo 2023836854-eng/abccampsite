@@ -1,7 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.util.*" %>
+<%@ page import="model.AvailableRoom, model.Campsite" %>
 <%
-    Map<String, Object> room = (Map<String, Object>) request.getAttribute("room");
+    AvailableRoom room = (AvailableRoom) request.getAttribute("room");
+    Campsite campsite = (Campsite) request.getAttribute("campsite");
     if(room == null) {
         response.sendRedirect(request.getContextPath() + "/admin/ManageRoomServlet");
         return;
@@ -56,65 +57,51 @@
                 <div class="col-md-8">
                     <div class="form-container">
                         <form action="${pageContext.request.contextPath}/admin/ManageRoomServlet" method="post">
-                            <input type="hidden" name="action" value="update">
-                            <input type="hidden" name="id" value="<%= room.get("roomId") %>">
+                            <input type="hidden" name="roomId" value="<%= room.getRoomId() %>">
+                            <input type="hidden" name="campsiteId" value="<%= room.getCampsiteId() %>">
                             
                             <div class="mb-3">
-                                <label for="campsiteId" class="form-label">Campsite</label>
-                                <select class="form-select" id="campsiteId" name="campsiteId" disabled>
-                                    <%
-                                        List<Map<String, Object>> campsites = 
-                                            (List<Map<String, Object>>) request.getAttribute("campsites");
-                                        if(campsites != null) {
-                                            for(Map<String, Object> campsite : campsites) {
-                                                boolean isSelected = campsite.get("campsiteId").equals(room.get("campsiteId"));
-                                    %>
-                                    <option value="<%= campsite.get("campsiteId") %>" <%= isSelected ? "selected" : "" %>>
-                                        <%= campsite.get("campsiteName") %> - <%= campsite.get("location") %>
-                                    </option>
-                                    <% 
-                                            }
-                                        }
-                                    %>
-                                </select>
+                                <label for="campsiteName" class="form-label">Campsite</label>
+                                <input type="text" class="form-control" id="campsiteName" 
+                                       value="<%= campsite != null ? campsite.getName() : room.getCampsiteName() %>" disabled>
                                 <div class="form-text">Campsite cannot be changed once room is created</div>
                             </div>
                             
                             <div class="mb-3">
-                                <label for="roomName" class="form-label">Room Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="roomName" name="roomName" 
-                                       value="<%= room.get("roomName") %>" required>
+                                <label for="name" class="form-label">Room Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="name" name="name" 
+                                       value="<%= room.getName() %>" required>
                             </div>
                             
                             <div class="mb-3">
                                 <label for="location" class="form-label">Location <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="location" name="location" 
-                                       value="<%= room.get("location") %>" required>
+                                       value="<%= room.getLocation() %>" required>
                             </div>
                             
                             <div class="mb-3">
                                 <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
                                 <textarea class="form-control" id="description" name="description" rows="4" 
-                                          required><%= room.get("description") %></textarea>
+                                          required><%= room.getDescription() != null ? room.getDescription() : "" %></textarea>
                             </div>
                             
                             <div class="mb-3">
-                                <label for="imageUrl" class="form-label">Image URL</label>
-                                <input type="url" class="form-control" id="imageUrl" name="imageUrl" 
-                                       value="<%= room.get("imageUrl") != null ? room.get("imageUrl") : "" %>">
+                                <label for="image" class="form-label">Image URL</label>
+                                <input type="url" class="form-control" id="image" name="image" 
+                                       value="<%= room.getImage() != null ? room.getImage() : "" %>">
                             </div>
                             
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="pricePerTent" class="form-label">Price per Tent ($) <span class="text-danger">*</span></label>
                                     <input type="number" class="form-control" id="pricePerTent" name="pricePerTent" 
-                                           step="0.01" min="0" value="<%= room.get("pricePerTent") %>" required>
+                                           step="0.01" min="0" value="<%= room.getPricePerTent() %>" required>
                                 </div>
                                 
                                 <div class="col-md-6 mb-3">
                                     <label for="quota" class="form-label">Quota (Max Tents) <span class="text-danger">*</span></label>
                                     <input type="number" class="form-control" id="quota" name="quota" 
-                                           min="1" value="<%= room.get("quota") %>" required>
+                                           min="1" value="<%= room.getQuota() %>" required>
                                 </div>
                             </div>
                             

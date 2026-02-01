@@ -91,17 +91,41 @@ public class ManageRoomServlet extends HttpServlet {
                     
                 case "delete":
                     // Delete room
-                    String deleteRoomIdStr = request.getParameter("roomId");
+                    String deleteRoomIdStr = request.getParameter("id");
+                    if (deleteRoomIdStr == null || deleteRoomIdStr.trim().isEmpty()) {
+                        deleteRoomIdStr = request.getParameter("roomId");
+                    }
                     String deleteCampsiteIdStr = request.getParameter("campsiteId");
                     if (deleteRoomIdStr != null && !deleteRoomIdStr.trim().isEmpty()) {
                         int roomId = Integer.parseInt(deleteRoomIdStr);
                         boolean deleted = roomDAO.delete(roomId);
                         String message = deleted ? "Room deleted successfully" : 
                                                   "Failed to delete room";
-                        String redirectUrl = "ManageRoomServlet?message=" + 
+                        String redirectUrl = "ManageRoomServlet?success=" + 
                                            java.net.URLEncoder.encode(message, "UTF-8");
                         if (deleteCampsiteIdStr != null && !deleteCampsiteIdStr.trim().isEmpty()) {
                             redirectUrl += "&campsiteId=" + deleteCampsiteIdStr;
+                        }
+                        response.sendRedirect(redirectUrl);
+                    } else {
+                        response.sendRedirect("ManageRoomServlet?error=" + 
+                                            java.net.URLEncoder.encode("Invalid room ID", "UTF-8"));
+                    }
+                    break;
+                    
+                case "toggle":
+                    // Toggle room active status
+                    String toggleRoomIdStr = request.getParameter("roomId");
+                    String toggleCampsiteIdStr = request.getParameter("campsiteId");
+                    if (toggleRoomIdStr != null && !toggleRoomIdStr.trim().isEmpty()) {
+                        int roomId = Integer.parseInt(toggleRoomIdStr);
+                        boolean toggled = roomDAO.toggleActive(roomId);
+                        String message = toggled ? "Room status updated successfully" : 
+                                                  "Failed to update room status";
+                        String redirectUrl = "ManageRoomServlet?success=" + 
+                                           java.net.URLEncoder.encode(message, "UTF-8");
+                        if (toggleCampsiteIdStr != null && !toggleCampsiteIdStr.trim().isEmpty()) {
+                            redirectUrl += "&campsiteId=" + toggleCampsiteIdStr;
                         }
                         response.sendRedirect(redirectUrl);
                     } else {
@@ -125,6 +149,9 @@ public class ManageRoomServlet extends HttpServlet {
                         List<AvailableRoom> rooms = roomDAO.getAll();
                         request.setAttribute("rooms", rooms);
                     }
+                    // Also load all campsites for the filter dropdown
+                    List<Campsite> campsites = campsiteDAO.getAll();
+                    request.setAttribute("campsites", campsites);
                     request.getRequestDispatcher("/admin/manageRoom.jsp").forward(request, response);
                     break;
             }
@@ -213,7 +240,7 @@ public class ManageRoomServlet extends HttpServlet {
             }
             
             // Redirect to room list with message
-            response.sendRedirect("ManageRoomServlet?message=" + 
+            response.sendRedirect("ManageRoomServlet?success=" + 
                                 java.net.URLEncoder.encode(message, "UTF-8") +
                                 "&campsiteId=" + campsiteId);
             

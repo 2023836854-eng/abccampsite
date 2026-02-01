@@ -162,8 +162,13 @@ function cancelBooking(bookingId) {
 				<td><span class="status-badge <%=statusClass%>"><%=status%></span></td>
 				<td><%=booking.getPaymentStatus()%></td>
 				<td>
-					<a class="view-btn" href="receipt.jsp?bookingId=<%=booking.getBookingId()%>">View Receipt</a>
 					<%
+					// Only show View Receipt after payment is made
+					if ("Paid".equalsIgnoreCase(booking.getPaymentStatus())) {
+					%>
+						<a class="view-btn" href="receipt.jsp?bookingId=<%=booking.getBookingId()%>">View Receipt</a>
+					<%
+					}
 					if (canPay) {
 					%>
 						<a class="pay-btn" href="payment.jsp?bookingId=<%=booking.getBookingId()%>">Pay</a>

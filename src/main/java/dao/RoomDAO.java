@@ -270,4 +270,17 @@ public class RoomDAO {
         }
         return list;
     }
+    
+    public boolean toggleActive(int roomId) {
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(
+                 "UPDATE available_rooms SET is_active = NOT is_active WHERE room_id=?")) {
+            ps.setInt(1, roomId);
+            ps.executeUpdate();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

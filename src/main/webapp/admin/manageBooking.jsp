@@ -176,18 +176,43 @@
                                 <td><strong>$<%= new DecimalFormat("#,##0.00").format(booking.getTotalPrice()) %></strong></td>
                                 <td>
                                     <div class="btn-group">
-                                        <button class="btn btn-sm btn-info action-btn" 
-                                                onclick="viewBooking('<%= booking.getBookingId() %>')">
-                                            <i class="fas fa-eye"></i>
+                                        <% 
+                                            String status = booking.getStatus();
+                                            java.sql.Date bookingDate = booking.getBookingDate();
+                                            java.sql.Date checkoutDate = booking.getCheckoutDate();
+                                            java.time.LocalDate today = java.time.LocalDate.now();
+                                            java.time.LocalDate checkIn = bookingDate.toLocalDate();
+                                            java.time.LocalDate checkOut = checkoutDate.toLocalDate();
+                                            
+                                            // Check In button - only show if status is Pending/Confirmed and date is within range
+                                            if (("Pending".equalsIgnoreCase(status) || "Confirmed".equalsIgnoreCase(status)) &&
+                                                !today.isBefore(checkIn) && !today.isAfter(checkOut)) {
+                                        %>
+                                        <button class="btn btn-sm btn-success action-btn" 
+                                                onclick="checkIn('<%= booking.getBookingId() %>')">
+                                            <i class="fas fa-sign-in-alt"></i> Check In
                                         </button>
-                                        <% if(!"cancelled".equalsIgnoreCase(status) && !"completed".equalsIgnoreCase(status)) { %>
-                                        <button class="btn btn-sm btn-warning action-btn" 
-                                                onclick="updateStatus('<%= booking.getBookingId() %>')">
-                                            <i class="fas fa-edit"></i>
+                                        <% 
+                                            }
+                                            
+                                            // Check Out button - only show if status is Ongoing
+                                            if ("Ongoing".equalsIgnoreCase(status)) {
+                                        %>
+                                        <button class="btn btn-sm btn-primary action-btn" 
+                                                onclick="checkOut('<%= booking.getBookingId() %>')">
+                                            <i class="fas fa-sign-out-alt"></i> Check Out
                                         </button>
+                                        <% 
+                                            }
+                                            
+                                            // Cancel button - only show if booking hasn't started yet
+                                            if (!"Cancelled".equalsIgnoreCase(status) && 
+                                                !"Completed".equalsIgnoreCase(status) && 
+                                                !"Ongoing".equalsIgnoreCase(status)) {
+                                        %>
                                         <button class="btn btn-sm btn-danger action-btn" 
                                                 onclick="cancelBooking('<%= booking.getBookingId() %>')">
-                                            <i class="fas fa-times"></i>
+                                            <i class="fas fa-times"></i> Cancel
                                         </button>
                                         <% } %>
                                     </div>
@@ -235,19 +260,20 @@
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function viewBooking(id) {
-            window.location.href = '${pageContext.request.contextPath}/admin/ManageBookingServlet?action=view&id=' + id;
+        function checkIn(id) {
+            if(confirm('Are you sure you want to check in this booking?')) {
+                window.location.href = '${pageContext.request.contextPath}/admin/ManageBookingServlet?action=checkin&id=' + id;
+            }
         }
         
-        function updateStatus(id) {
-            const newStatus = prompt('Enter new status (pending/confirmed/completed):');
-            if(newStatus) {
-                window.location.href = '${pageContext.request.contextPath}/admin/ManageBookingServlet?action=updateStatus&id=' + id + '&status=' + newStatus;
+        function checkOut(id) {
+            if(confirm('Are you sure you want to check out this booking? This will mark it as completed.')) {
+                window.location.href = '${pageContext.request.contextPath}/admin/ManageBookingServlet?action=checkout&id=' + id;
             }
         }
         
         function cancelBooking(id) {
-            if(confirm('Are you sure you want to cancel this booking?')) {
+            if(confirm('Are you sure you want to cancel this booking? If paid, the guest will be refunded.')) {
                 window.location.href = '${pageContext.request.contextPath}/admin/ManageBookingServlet?action=cancel&id=' + id;
             }
         }
