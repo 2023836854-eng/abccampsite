@@ -236,8 +236,9 @@ After importing sample data:
 5. **Manage Rooms:**
    - Add rooms to campsites
    - Edit room details (price, quota, description)
-   - Update available quota
+   - Update maximum quota (capacity)
    - Delete unused rooms
+   - For detailed information on quota management, see [Quota Update Guide](QUOTA_UPDATE_GUIDE.md)
 
 ## 🔒 Security Features
 
@@ -300,4 +301,7 @@ This project is created for educational purposes (university assignment).
 
 ## 📞 Support
 
-For issues or questions, please contact the development team or refer to the project documentation in `/admin/README.md` for admin-specific features.
+For issues or questions, please contact the development team or refer to the project documentation:
+- [Admin Navigation Guide](ADMIN_NAVIGATION_GUIDE.md) - Admin panel navigation and troubleshooting
+- [Quota Update Guide](QUOTA_UPDATE_GUIDE.md) - Detailed guide on managing room quotas
+- General admin features documentation
