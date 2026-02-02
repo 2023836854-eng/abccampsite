@@ -163,6 +163,24 @@ public class RoomDAO {
         }
     }
     
+    /**
+     * Updates the available quota for a room in a thread-safe manner.
+     * 
+     * This method uses database-level locking (SELECT FOR UPDATE) to prevent race conditions
+     * when multiple users are booking or cancelling at the same time.
+     * 
+     * The method implements a subtract-based approach:
+     * - Positive quantity: DECREASES available quota (for bookings)
+     *   Example: updateQuota(roomId, 5) decreases quota by 5
+     * - Negative quantity: INCREASES available quota (for cancellations)
+     *   Example: updateQuota(roomId, -5) increases quota by 5
+     * 
+     * SQL operation: available_quota = available_quota - quantity
+     * 
+     * @param roomId The ID of the room to update
+     * @param quantity The amount to change the quota by (positive to decrease, negative to increase)
+     * @return true if the update was successful, false if room not found or insufficient quota
+     */
     public boolean updateQuota(int roomId, int quantity) {
         Connection con = null;
         PreparedStatement selectPs = null;
