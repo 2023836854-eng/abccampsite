@@ -2,6 +2,8 @@
 
 A comprehensive campsite booking and management system built with Java EE (JSP, Servlets), MySQL, and modern web technologies.
 
+> 📚 **[View Complete Documentation Index](DOCUMENTATION_INDEX.md)** | **[Quota Update Guide](ANSWER_QUOTA_UPDATE.md)**
+
 ## 🌟 Features
 
 ### Guest Features
