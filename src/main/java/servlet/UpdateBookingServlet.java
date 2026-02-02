@@ -95,10 +95,10 @@ public class UpdateBookingServlet extends HttpServlet {
         boolean cancelled = bookingDAO.cancel(bookingId, cancellationReason);
         
         if (cancelled) {
-            // Restore room quota
+            // Restore room quota (pass negative value to add back quota)
             int numTents = booking.getNumTents();
             int roomId = booking.getRoomId();
-            roomDAO.updateQuota(roomId, numTents);
+            roomDAO.updateQuota(roomId, -numTents);
             
             // Redirect based on user type
             if (SessionUtil.isAdminLoggedIn(request)) {
