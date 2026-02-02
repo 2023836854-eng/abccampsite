@@ -184,7 +184,8 @@ public class RoomDAO {
             }
 
             int availableQuota = rs.getInt(1);
-            if (availableQuota < quantity) {
+            // Check if we have enough quota only when decreasing (positive quantity)
+            if (quantity > 0 && availableQuota < quantity) {
                 con.rollback();
                 return false;
             }

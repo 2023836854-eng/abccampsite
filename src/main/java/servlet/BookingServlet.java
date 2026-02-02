@@ -118,8 +118,8 @@ public class BookingServlet extends HttpServlet {
             boolean bookingCreated = bookingDAO.create(booking);
             
             if (bookingCreated) {
-                // Update room quota
-                boolean quotaUpdated = roomDAO.updateQuota(roomId, -numTents);
+                // Update room quota - decrease by numTents (updateQuota method subtracts the value)
+                boolean quotaUpdated = roomDAO.updateQuota(roomId, numTents);
                 
                 if (quotaUpdated) {
                     // Redirect to booking confirmation page

@@ -230,6 +230,11 @@ public class ManageRoomServlet extends HttpServlet {
                 // Update existing room
                 int roomId = Integer.parseInt(roomIdStr);
                 room.setRoomId(roomId);
+                // Preserve existing availableQuota when updating
+                AvailableRoom existingRoom = roomDAO.getById(roomId);
+                if (existingRoom != null) {
+                    room.setAvailableQuota(existingRoom.getAvailableQuota());
+                }
                 success = roomDAO.update(room);
                 message = success ? "Room updated successfully" : "Failed to update room";
             } else {
